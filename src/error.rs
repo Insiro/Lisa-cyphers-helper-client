@@ -21,6 +21,3 @@ impl ParsingError {
         &self.error
     }
 }
-pub fn ok() -> ParseResult<()> {
-    Ok(())
-}
