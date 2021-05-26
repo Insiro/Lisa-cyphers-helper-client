@@ -1,6 +1,6 @@
 use super::charactor;
 use super::clan;
-use crate::error::{ParseResult, ParseResults, ParsingError, ParsingErrorKind};
+use crate::error::{self, ParseResult, ParseResults, ParsingErrorKind};
 
 use chrono::{DateTime, Utc};
 
@@ -136,7 +136,7 @@ impl Player for ParsedPlayer {
 
     fn refrash_info(&mut self) -> ParseResult<()> {
         match &self.player_id {
-            None => Err(ParsingError::new(
+            None => Err(error::new(
                 "not saved user info".to_string(),
                 ParsingErrorKind::DataError,
             )),

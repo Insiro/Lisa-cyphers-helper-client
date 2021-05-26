@@ -12,8 +12,7 @@ impl GameRecord {
             records: vec![],
         }
     }
-    pub fn load(id: &str)->GameRecord {
-        
+    pub fn load(id: &str) -> GameRecord {
         GameRecord {
             player: player::ParsedPlayer::dumy(),
             records: vec![],

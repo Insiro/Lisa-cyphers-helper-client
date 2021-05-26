@@ -1,5 +1,11 @@
 use webbrowser;
 
+use crate::error::{self, ParseResult, ParsingErrorKind};
+
+use reqwest;
+use select::document::Document;
+use select::predicate::Class;
+
 pub struct ClanBase {
     name: String,
     post_url: Option<String>,
@@ -20,8 +26,29 @@ impl ClanBase {
     pub fn new(name: String, post_url: Option<String>) -> ClanBase {
         ClanBase { name, post_url }
     }
-    pub fn get_accessing(&self) -> Vec<String> {
-        vec![] //TODO: get accessing members from Clan
+    pub async fn get_accessing(&self) -> ParseResult<Vec<String>> {
+        let url = String::from("");
+        let ret: Document;
+        match reqwest::get(url).await {
+            Err(_) => {
+                return Err(error::new(
+                    "parsing Error".to_string(),
+                    ParsingErrorKind::NetworkError,
+                ))
+            }
+            Ok(re) if (!re.status().is_success()) => {
+                return Err(error::new(
+                    "parsing Error".to_string(),
+                    ParsingErrorKind::NetworkError,
+                ))
+            }
+            Ok(re) => ret = Document::from_read(re.text().await.unwrap().as_bytes()).unwrap(),
+        };
+        let mut accessing_members: Vec<String> = Vec::new();
+        for item in ret.find(Class("member_list")) {
+            accessing_members.push(item.text().trim().to_string());
+        }
+        Ok(accessing_members)
     }
     pub fn get_clan_name(&self) -> &str {
         &self.name

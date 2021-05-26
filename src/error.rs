@@ -10,10 +10,10 @@ pub enum ParsingErrorKind {
     NotDefinedError,
     DataError,
 }
+pub fn new(msg: String, error: ParsingErrorKind) -> ParsingError {
+    ParsingError { msg, error }
+}
 impl ParsingError {
-    pub fn new(msg: String, error: ParsingErrorKind) -> ParsingError {
-        ParsingError { msg, error }
-    }
     pub fn get_msg(&self) -> &str {
         &self.msg
     }
