@@ -1,11 +1,12 @@
 use webbrowser;
 
 use crate::error::{self, ParseResult, ParsingErrorKind};
-
+use serde::{Serialize, Deserialize};
 use reqwest;
 use select::document::Document;
 use select::predicate::Class;
 
+#[derive(Serialize, Deserialize)]
 pub struct ClanBase {
     name: String,
     post_url: Option<String>,

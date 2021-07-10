@@ -2,6 +2,8 @@ use super::charactor;
 use super::clan;
 use crate::error::{self, ParseResult, ParseResults, ParsingErrorKind};
 
+use serde::{Deserialize, Serialize};
+
 use chrono::{DateTime, Utc};
 
 type UtcTime = Option<DateTime<Utc>>;
@@ -31,6 +33,7 @@ pub trait Player {
     fn refrash_info(&mut self) -> ParseResult<()>;
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct PlayerBase {
     player_name: String,
     player_id: Option<String>,

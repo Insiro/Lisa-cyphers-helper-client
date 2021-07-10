@@ -1,7 +1,9 @@
+use crate::data_serializer::date_se;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+type UtcTime = DateTime<Utc>;
 
-type UtcTime = Option<DateTime<Utc>>;
-
+#[derive(Serialize, Deserialize)]
 enum Kind {
     App,
     HotPotato,
@@ -10,11 +12,14 @@ enum Kind {
     Event,
     CyphersNotic,
 }
+
+#[derive(Serialize, Deserialize)]
 pub struct Notify {
     kind: Kind,
     link: Option<String>,
     title: Option<String>,
-    date: UtcTime,
+    #[serde(with = "date_se")]
+    date: Option<UtcTime>,
 }
 
 impl Notify {

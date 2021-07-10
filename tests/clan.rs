@@ -3,7 +3,7 @@ mod private;
 
 use reqwest;
 use select::document::Document;
-use select::predicate::{Class};
+use select::predicate::Class;
 
 #[tokio::test]
 async fn get_accessing() {
