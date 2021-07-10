@@ -1,7 +1,7 @@
 extern crate lisa;
 use lisa::client;
-#[tokio::main]
-async fn main() {
-    println!("st");
+
+#[test]
+pub fn client_init() {
     client::init();
 }

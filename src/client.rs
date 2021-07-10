@@ -96,7 +96,9 @@ impl Client {
     fn get_api_key(&self) -> &str {
         &self.neople_api_key
     }
-    fn open_game_page(&self) {}
+    fn open_game_page(&self) {
+        //TODO: open webBrowser
+    }
     fn get_payers(&mut self) -> &mut Vec<player::PlayerBase> {
         &mut self.players
     }

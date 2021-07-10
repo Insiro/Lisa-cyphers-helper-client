@@ -1,17 +1,17 @@
-extern crate lisa;
-mod private;
-
 use reqwest;
 use select::document::Document;
 use select::predicate::Class;
+use tokio::{self};
+// use std::future::Future;
 
 #[tokio::test]
-async fn get_accessing() {
-    let url = private::clan_url();
-    let res = reqwest::get(url).await.unwrap();
+async fn t1() {
+    //TODO: controll unwrap
+    let res = reqwest::get("http://cyphers.nexon.com/cyphers/clan/zealot")
+        .await
+        .unwrap();
     assert!(res.status().is_success());
-    let ret: Document = Document::from_read(res.text().await.unwrap().as_bytes()).unwrap();
-    println!("accessing members : ");
+    let ret = Document::from_read(res.text().await.unwrap().as_bytes()).unwrap();
     let mut accessing_members: Vec<String> = Vec::new();
     for item in ret.find(Class("member_list")) {
         let mut name = String::new();

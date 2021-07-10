@@ -1,10 +1,13 @@
 extern crate lisa;
 mod private;
-use json;
 use lisa::exs;
 use lisa::object::clan;
 use reqwest;
 use select;
+use serde::{Deserialize, Serialize};
+use serde_json::{self, Value};
+
+#[derive(Serialize, Deserialize)]
 pub struct ParsedPlayer {
     player_name: String,
     player_id: Option<String>,
@@ -14,6 +17,7 @@ pub struct ParsedPlayer {
     tier_point: u8,
     clan: Option<clan::ClanBase>,
 }
+
 #[tokio::test]
 async fn get_info() {
     let test_name = private::user::name();
@@ -26,15 +30,13 @@ async fn get_info() {
         ])
         .send()
         .await
-        .unwrap();
-    let parsed = json::parse(res.text().await.unwrap().as_str()).unwrap();
-    let row = parsed["rows"][0].clone();
-    println!("parsed Data\n{}", json::stringify(parsed.clone()));
+        .expect("access err");
+    let parsed: Value = serde_json::from_str(res.text().await.unwrap().as_str()).unwrap();
+    let row = match parsed["rows"].get(0) {
+        Some(row) => row,
+        None => panic!(),
+    };
     assert_eq!(row["playerId"].as_str().unwrap(), private::user::id());
     assert_eq!(row["nickname"].as_str().unwrap(), &test_name);
-    assert_eq!(row["grade"].as_u8().unwrap(), private::user::grade());
-}
-#[tokio::test]
-async fn parsed_payer(){
-    
+    assert_eq!(row["grade"], private::user::grade());
 }

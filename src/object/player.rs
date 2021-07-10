@@ -2,12 +2,13 @@ use super::charactor;
 use super::clan;
 use crate::error::{self, ParseResult, ParseResults, ParsingErrorKind};
 
-use serde::{Deserialize, Serialize};
-
+use crate::data_serializer::date_se;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 type UtcTime = Option<DateTime<Utc>>;
 
+#[derive(Serialize, Deserialize)]
 pub enum Gender {
     Male,
     Female,
@@ -39,6 +40,7 @@ pub struct PlayerBase {
     player_id: Option<String>,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ParsedPlayer {
     player_name: String,
     player_id: Option<String>,
@@ -84,12 +86,15 @@ impl ParsedPlayer {
         ParsedPlayer::dumy()
     }
 }
+
+#[derive(Serialize, Deserialize)]
 pub struct SavedPlayer {
     player_info: ParsedPlayer,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
     position: charactor::CharList,
+    #[serde(with = "date_se")]
     birth_day: UtcTime,
 }
 trait PlayerSavedData {
@@ -194,6 +199,7 @@ impl SavedPlayer {
         &self.position
     }
     pub fn set_birthday(&mut self, birthday: String) -> bool {
+        //TODO:: set birth day from string
         false
     }
     pub fn set_memo(&mut self, memo: String) {

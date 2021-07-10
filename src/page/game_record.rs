@@ -1,6 +1,8 @@
 use crate::object::charactor::Charactor;
 use crate::object::player;
+use serde::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct GameRecord {
     player: player::ParsedPlayer,
     records: Vec<GameInfo>,
@@ -20,10 +22,13 @@ impl GameRecord {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 enum GameType {
     Normal,
     Rating,
 }
+
+#[derive(Serialize, Deserialize)]
 pub struct GameInfo {
     match_id: String,
     game_type: GameType,
