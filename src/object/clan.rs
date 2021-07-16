@@ -1,10 +1,10 @@
 use webbrowser;
 
-use crate::error::{self, ParseResult, ParsingErrorKind};
-use serde::{Serialize, Deserialize};
+use crate::error::ParseError;
 use reqwest;
 use select::document::Document;
 use select::predicate::Class;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct ClanBase {
@@ -27,20 +27,20 @@ impl ClanBase {
     pub fn new(name: String, post_url: Option<String>) -> ClanBase {
         ClanBase { name, post_url }
     }
-    pub async fn get_accessing(&self) -> ParseResult<Vec<String>> {
+    pub async fn get_accessing(&self) -> Result<Vec<String>, ParseError::Error> {
         let url = String::from("");
         let ret: Document;
         match reqwest::get(url).await {
             Err(_) => {
-                return Err(error::new(
+                return Err(ParseError::new(
                     "parsing Error".to_string(),
-                    ParsingErrorKind::NetworkError,
+                    ParseError::Kind::NetworkError,
                 ))
             }
             Ok(re) if (!re.status().is_success()) => {
-                return Err(error::new(
+                return Err(ParseError::new(
                     "parsing Error".to_string(),
-                    ParsingErrorKind::NetworkError,
+                    ParseError::Kind::NetworkError,
                 ))
             }
             Ok(re) => ret = Document::from_read(re.text().await.unwrap().as_bytes()).unwrap(),

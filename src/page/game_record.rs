@@ -8,18 +8,22 @@ pub struct GameRecord {
     records: Vec<GameInfo>,
 }
 impl GameRecord {
-    pub fn dumy() -> GameRecord {
-        GameRecord {
-            player: player::ParsedPlayer::dumy(),
-            records: vec![],
-        }
+    pub fn get_player(&mut self) -> &player::ParsedPlayer {
+        &self.player
     }
-    pub fn load(id: &str) -> GameRecord {
-        GameRecord {
-            player: player::ParsedPlayer::dumy(),
-            records: vec![],
-        }
+    pub fn get_records(&self) -> &Vec<GameInfo> {
+        &self.records
     }
+}
+pub fn dumy() -> GameRecord {
+    GameRecord {
+        player: player::ParsedPlayer::dumy(),
+        records: vec![],
+    }
+}
+pub fn search(id: &str) -> Option<GameRecord> {
+    //TODO: search by api
+    Some(dumy())
 }
 
 #[derive(Serialize, Deserialize)]
@@ -44,4 +48,17 @@ impl GameInfo {
     }
 }
 
-pub fn cli(args: &mut Vec<String>, level: u8) {}
+pub fn cli(args: &mut Vec<&str>, position: usize) {
+    match args.get(position) {
+        None => cli_main(),
+        Some(arg) => match search(arg) {
+            None => {}
+            Some(re) => {}
+        },
+    }
+}
+
+fn cli_main() {}
+fn cli_searched(){
+    
+}

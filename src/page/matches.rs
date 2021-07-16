@@ -69,6 +69,10 @@ impl MatchInfo {
 pub fn get_match(id: &str) -> MatchInfo {
     MatchInfo::dumy()
 }
+
+
+pub fn cli( args:&mut Vec<&str>, position:u8) {}
+
 pub fn cls() {
     loop {
         let query = "".to_string();

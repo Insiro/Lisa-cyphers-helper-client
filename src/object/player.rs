@@ -1,8 +1,8 @@
 use super::charactor;
 use super::clan;
-use crate::error::{self, ParseResult, ParseResults, ParsingErrorKind};
+use crate::error::ParseError::{self, PResult};
 
-use crate::data_serializer::date_se;
+use crate::util::data_serializer::date_se;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -15,13 +15,13 @@ pub enum Gender {
     Unknown,
 }
 
-pub fn get_user_id(name: String) -> ParseResults {
+pub fn get_user_id(name: String) -> PResult<String> {
     let id = String::from(""); //TODO : Search user ID by neople API
 
     Ok(id)
 }
 
-pub fn get_user_name(id: String) -> ParseResults {
+pub fn get_user_name(id: String) -> Result<String, ParseError::Error> {
     let name = String::from(" "); //TODO: get user name from neople API
     Ok(name)
 }
@@ -29,9 +29,9 @@ pub fn get_user_name(id: String) -> ParseResults {
 pub trait Player {
     fn set_player_name(&mut self, player_name: Option<String>) -> bool;
     fn get_player_name(&self) -> &str;
-    fn set_player_id(&mut self, id: Option<String>) -> ParseResult<()>;
+    fn set_player_id(&mut self, id: Option<String>) -> PResult<()>;
     fn get_player_id(&self) -> &Option<String>;
-    fn refrash_info(&mut self) -> ParseResult<()>;
+    fn refrash_info(&mut self) -> PResult<()>;
 }
 
 #[derive(Serialize, Deserialize)]
@@ -87,26 +87,6 @@ impl ParsedPlayer {
     }
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct SavedPlayer {
-    player_info: ParsedPlayer,
-    memo: Option<String>,
-    gender: Gender,
-    name: Option<String>,
-    position: charactor::CharList,
-    #[serde(with = "date_se")]
-    birth_day: UtcTime,
-}
-trait PlayerSavedData {
-    fn set_gender(&mut self, gender: Gender);
-    fn get_gender(&self) -> &Gender;
-    fn set_name(&mut self);
-    fn get_name(&self) -> &Option<String>;
-    fn set_birthday(&mut self, birhday: UtcTime);
-    fn get_birthday(&self) -> &UtcTime;
-    fn get_player_info(&self) -> &ParsedPlayer;
-}
-
 impl Player for ParsedPlayer {
     fn set_player_name(&mut self, player_name: Option<String>) -> bool {
         match player_name {
@@ -121,7 +101,7 @@ impl Player for ParsedPlayer {
             }
         }
     }
-    fn set_player_id(&mut self, player_id: Option<String>) -> ParseResult<()> {
+    fn set_player_id(&mut self, player_id: Option<String>) -> PResult<()> {
         // None : Remove Player id
         match &player_id {
             None => {
@@ -142,11 +122,11 @@ impl Player for ParsedPlayer {
         }
     }
 
-    fn refrash_info(&mut self) -> ParseResult<()> {
+    fn refrash_info(&mut self) -> PResult<()> {
         match &self.player_id {
-            None => Err(error::new(
+            None => Err(ParseError::new(
                 "not saved user info".to_string(),
-                ParsingErrorKind::DataError,
+                ParseError::Kind::DataError,
             )),
             Some(id) => match get_user_name(id.to_string()) {
                 Ok(string) => {
@@ -163,46 +143,5 @@ impl Player for ParsedPlayer {
 
     fn get_player_id(&self) -> &Option<String> {
         &self.player_id
-    }
-}
-
-impl SavedPlayer {
-    pub fn dumy() -> SavedPlayer {
-        SavedPlayer {
-            player_info: ParsedPlayer::dumy(),
-            memo: None,
-            gender: Gender::Unknown,
-            name: None,
-            position: vec![],
-            birth_day: None,
-        }
-    }
-    pub fn new(
-        player_info: ParsedPlayer,
-        memo: Option<String>,
-        gender: Gender,
-        name: Option<String>,
-        position: charactor::CharList,
-        birth_day: UtcTime,
-    ) -> SavedPlayer {
-        SavedPlayer {
-            player_info,
-            memo,
-            gender,
-            name,
-            position,
-            birth_day,
-        }
-    }
-
-    pub fn get_positions(&self) -> &charactor::CharList {
-        &self.position
-    }
-    pub fn set_birthday(&mut self, birthday: String) -> bool {
-        //TODO:: set birth day from string
-        false
-    }
-    pub fn set_memo(&mut self, memo: String) {
-        self.memo = Some(memo);
     }
 }

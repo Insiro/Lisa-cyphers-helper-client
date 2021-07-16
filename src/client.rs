@@ -2,24 +2,23 @@ use crate::object::charactor::CharList;
 use crate::object::clan;
 use crate::object::player;
 
-//TODO: change to exactly
-use crate::data_serializer::date_se;
-use crate::temp;
+use crate::util::{data_serializer::date_se, temp};
 use chrono::{DateTime, Utc};
+use reqwest;
+use serde::{Deserialize, Serialize};
+use serde_json;
 use std::cell::RefCell;
 use std::fs;
 use std::io::Write;
 use std::path::Path;
 use std::rc::Rc;
 
-use serde::{Deserialize, Serialize};
-use serde_json::{self, json, Value};
-
-type ClientOption = Option<Client>;
-type rc_client = Rc<RefCell<Client>>;
-static mut StaticClient: Option<rc_client> = None;
-
 type UtcTime = DateTime<Utc>;
+
+type RcClient = Rc<RefCell<Client>>;
+
+static mut STATIC_CLIENT: Option<RcClient> = None;
+static mut REQ_CLIENT: Option<Rc<RefCell<reqwest::Client>>> = None;
 
 #[derive(Serialize, Deserialize)]
 pub struct Client {
@@ -81,13 +80,22 @@ fn new_client() -> Client {
 
 pub fn init() {
     unsafe {
-        StaticClient = Some(Rc::new(RefCell::new(new_client())));
+        REQ_CLIENT = Some(Rc::new(RefCell::new(reqwest::Client::new())));
+        STATIC_CLIENT = Some(Rc::new(RefCell::new(new_client())));
     }
 }
-fn get_client() -> Option<rc_client> {
+fn get_client() -> Option<RcClient> {
     unsafe {
-        match &StaticClient {
+        match &STATIC_CLIENT {
             Some(rcs) => Some(Rc::clone(&rcs)),
+            None => None,
+        }
+    }
+}
+fn get_req_client() -> Option<Rc<RefCell<reqwest::Client>>> {
+    unsafe {
+        match &REQ_CLIENT {
+            Some(req) => Some(Rc::clone(&req)),
             None => None,
         }
     }

@@ -1,9 +1,8 @@
 extern crate lisa;
 mod private;
-use lisa::exs;
 use lisa::object::clan;
+use lisa::util::exs;
 use reqwest;
-use select;
 use serde::{Deserialize, Serialize};
 use serde_json::{self, Value};
 
