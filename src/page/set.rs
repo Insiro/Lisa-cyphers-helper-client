@@ -1,1 +1,1 @@
-pub fn cli( args:&mut Vec<&str>, position:u8) {}
+pub fn cli(mut args: Vec<String>) {}

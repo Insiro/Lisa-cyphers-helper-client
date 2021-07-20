@@ -19,3 +19,4 @@ Cargo.lock
 # private
 **/private.rs
 goorm.manifest
+reqData/

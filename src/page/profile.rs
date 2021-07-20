@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fs;
 use std::path::Path;
@@ -66,7 +66,7 @@ impl Profile {
         self.memo = Some(memo);
     }
     pub fn Save(&self) -> Result<(), String> {
-        //TODO: save to db
+        //TODO: save to db 1) check have saved data 2) create or override data
         Ok(())
     }
 }
@@ -89,4 +89,4 @@ pub fn load(dir: &str) -> Result<Profile, String> {
     }
 }
 
-pub fn cli(args: &mut Vec<&str>, position: u8) {}
+pub fn cli(mut args: Vec<String>) {}

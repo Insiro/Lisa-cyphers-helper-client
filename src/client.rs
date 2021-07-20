@@ -2,7 +2,7 @@ use crate::object::charactor::CharList;
 use crate::object::clan;
 use crate::object::player;
 
-use crate::util::{data_serializer::date_se, temp};
+use crate::util::{data_serializer::date_se, history, temp};
 use chrono::{DateTime, Utc};
 use reqwest;
 use serde::{Deserialize, Serialize};
@@ -19,7 +19,7 @@ type RcClient = Rc<RefCell<Client>>;
 
 static mut STATIC_CLIENT: Option<RcClient> = None;
 static mut REQ_CLIENT: Option<Rc<RefCell<reqwest::Client>>> = None;
-
+static mut HISTORY: Option<Rc<RefCell<history::Histories>>> = None;
 #[derive(Serialize, Deserialize)]
 pub struct Client {
     //setting data
@@ -82,9 +82,10 @@ pub fn init() {
     unsafe {
         REQ_CLIENT = Some(Rc::new(RefCell::new(reqwest::Client::new())));
         STATIC_CLIENT = Some(Rc::new(RefCell::new(new_client())));
+        HISTORY = Some(Rc::new(RefCell::new(history::init())));
     }
 }
-fn get_client() -> Option<RcClient> {
+pub fn get_client() -> Option<RcClient> {
     unsafe {
         match &STATIC_CLIENT {
             Some(rcs) => Some(Rc::clone(&rcs)),
@@ -92,7 +93,7 @@ fn get_client() -> Option<RcClient> {
         }
     }
 }
-fn get_req_client() -> Option<Rc<RefCell<reqwest::Client>>> {
+pub fn get_req_client() -> Option<Rc<RefCell<reqwest::Client>>> {
     unsafe {
         match &REQ_CLIENT {
             Some(req) => Some(Rc::clone(&req)),
@@ -121,5 +122,13 @@ impl Client {
     }
     fn get_charactors(&mut self) -> &CharList {
         &self.charactors
+    }
+}
+pub fn get_history() -> Rc<RefCell<history::Histories>> {
+    unsafe {
+        match &HISTORY {
+            None => panic!(""),
+            Some(his) => Rc::clone(&his),
+        }
     }
 }

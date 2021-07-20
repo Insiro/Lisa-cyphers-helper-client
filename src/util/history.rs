@@ -1,3 +1,5 @@
+use crate::util::history;
+
 pub enum Kind {
     Main,
     Matches,
@@ -18,14 +20,19 @@ impl Kind {
 }
 pub struct History {
     name: Option<String>,
-    page: Kind,
+    page: history::Kind,
+    key: Option<String>,
 }
-
+pub fn init() -> Histories {
+    Histories { list: vec![] }
+}
 pub struct Histories {
     list: Vec<History>,
 }
-
 impl Histories {
+    pub fn len(&self) -> usize {
+        self.list.len()
+    }
     pub fn get_point(&self) -> String {
         let mut re = String::new();
         for item in self.list.iter() {
@@ -36,9 +43,7 @@ impl Histories {
     pub fn push(&mut self, history: History) {
         self.list.push(history);
     }
-    pub fn init() -> Histories {
-        Histories { list: vec![] }
-    }
+
     pub fn change_name(&mut self, name: &str) {
         match self.list.last_mut() {
             None => {}
@@ -47,6 +52,13 @@ impl Histories {
     }
     pub fn get_curr(&self) -> Option<&History> {
         self.list.last()
+    }
+    pub fn new(name: &str, page: history::Kind, key: Option<String>) -> History {
+        History {
+            name: Some(name.to_string()),
+            page,
+            key,
+        }
     }
 }
 
