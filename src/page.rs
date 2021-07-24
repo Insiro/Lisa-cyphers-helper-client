@@ -22,7 +22,7 @@ pub trait CLI {
 }
 
 impl Command {
-    pub fn as__str(&self) -> &str {
+    pub fn as_str(&self) -> &str {
         match self {
             Command::Exit => "Exit",
             Command::My => "My",
@@ -34,6 +34,20 @@ impl Command {
             Command::Profile => "Profile",
             Command::Err => "Err",
         }
+    }
+    pub fn help(&self, args: Vec<String>) {
+        match self {
+            Command::Exit | Command::Main => {
+                println!("back to main")
+            }
+            Command::My => my::help(args),
+            Command::User => game_record::help(args),
+            Command::Matchs => matches::help(args),
+            Command::Set => set::help(args),
+            Command::Help => println!("help <command> for detailes"),
+            Command::Profile => profile::help(args),
+            Command::Err => println!("Wrong Command"),
+        };
     }
     pub fn run_cli(&self, args: Vec<String>) -> Command {
         match self {
@@ -88,18 +102,23 @@ fn help(mut args: Vec<String>) {
     ];
     match args.pop() {
         None => {}
-        Some(ar) => match Command::from_str(&ar) {
-            Command::Main
-            | Command::Profile
-            | Command::Set
-            | Command::Matchs
-            | Command::User
-            | Command::My => {}
-            _ => {
-                for item in command_list.iter() {
-                    println!("{}", item);
+        Some(ar) => {
+            let cmd = Command::from_str(&ar);
+            match &cmd {
+                Command::Main
+                | Command::Profile
+                | Command::Set
+                | Command::Matchs
+                | Command::User
+                | Command::My => {
+                    cmd.help(args);
+                }
+                _ => {
+                    for item in command_list.iter() {
+                        println!("{}", item);
+                    }
                 }
             }
-        },
+        }
     };
 }

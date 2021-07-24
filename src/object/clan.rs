@@ -1,6 +1,6 @@
 use webbrowser;
 
-use crate::error::ParseError;
+use crate::error as lisa_error;
 use reqwest;
 use select::document::Document;
 use select::predicate::Class;
@@ -27,20 +27,20 @@ impl ClanBase {
     pub fn new(name: String, post_url: Option<String>) -> ClanBase {
         ClanBase { name, post_url }
     }
-    pub async fn get_accessing(&self) -> Result<Vec<String>, ParseError::Error> {
+    pub async fn get_accessing(&self) -> lisa_error::Result<Vec<String>> {
         let url = String::from("");
         let ret: Document;
         match reqwest::get(url).await {
             Err(_) => {
-                return Err(ParseError::new(
-                    "parsing Error".to_string(),
-                    ParseError::Kind::NetworkError,
+                return Err(lisa_error::new(
+                    "parsing Error",
+                    lisa_error::Kind::NetworkError,
                 ))
             }
             Ok(re) if (!re.status().is_success()) => {
-                return Err(ParseError::new(
-                    "parsing Error".to_string(),
-                    ParseError::Kind::NetworkError,
+                return Err(lisa_error::new(
+                    "parsing Error",
+                    lisa_error::Kind::NetworkError,
                 ))
             }
             Ok(re) => ret = Document::from_read(re.text().await.unwrap().as_bytes()).unwrap(),

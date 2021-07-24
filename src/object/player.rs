@@ -1,8 +1,8 @@
 use super::charactor;
 use super::clan;
-use crate::error::ParseError::{self, PResult};
+use crate::error as lisa_error;
 
-use crate::util::data_serializer::date_se;
+use crate::util::temp::parse;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -15,13 +15,19 @@ pub enum Gender {
     Unknown,
 }
 
-pub fn get_user_id(name: String) -> PResult<String> {
-    let id = String::from(""); //TODO : Search user ID by neople API
-
-    Ok(id)
+pub fn get_user_id(name: String) -> lisa_error::Result<String> {
+    //TODO:change to get_from_neople(sendString)
+    let rlt: Result<ParseBase, serde_json::Error> = serde_json::from_str(&parse::player_id(&name));
+    match rlt {
+        Ok(id) => Ok(id.nickname),
+        Err(_) => Err(lisa_error::new(
+            "getting Error",
+            lisa_error::Kind::UserNotFoundError,
+        )),
+    }
 }
 
-pub fn get_user_name(id: String) -> Result<String, ParseError::Error> {
+pub fn get_user_name(id: String) -> Result<String, lisa_error::Error> {
     let name = String::from(" "); //TODO: get user name from neople API
     Ok(name)
 }
@@ -29,15 +35,22 @@ pub fn get_user_name(id: String) -> Result<String, ParseError::Error> {
 pub trait Player {
     fn set_player_name(&mut self, player_name: Option<String>) -> bool;
     fn get_player_name(&self) -> &str;
-    fn set_player_id(&mut self, id: Option<String>) -> PResult<()>;
+    fn set_player_id(&mut self, id: Option<String>) -> lisa_error::Result<()>;
     fn get_player_id(&self) -> &Option<String>;
-    fn refrash_info(&mut self) -> PResult<()>;
+    fn refrash_info(&mut self) -> lisa_error::Result<()>;
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct PlayerBase {
     player_name: String,
     player_id: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct ParseBase {
+    playerId: String,
+    nickname: String,
+    grade: u8,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -81,9 +94,24 @@ impl ParsedPlayer {
             clan,
         }
     }
-    pub fn new(player_id: Option<String>) -> ParsedPlayer {
-        //TODO: get all data from id
-        ParsedPlayer::dumy()
+    pub fn new(player_id: Option<String>) -> lisa_error::Result<ParsedPlayer> {
+        match player_id {
+            None => return Ok(ParsedPlayer::dumy()),
+            Some(id) => {
+                //TODO:change to get_from_neople(snedString)
+                let ps: Result<ParsedPlayer, serde_json::Error> =
+                    serde_json::from_str(&parse::player_info(&id));
+                match ps {
+                    Err(_) => {
+                        return Err(lisa_error::new(
+                            "failed to parse",
+                            lisa_error::Kind::UserNotFoundError,
+                        ))
+                    }
+                    Ok(data) => return Ok(data),
+                };
+            }
+        }
     }
 }
 
@@ -101,7 +129,7 @@ impl Player for ParsedPlayer {
             }
         }
     }
-    fn set_player_id(&mut self, player_id: Option<String>) -> PResult<()> {
+    fn set_player_id(&mut self, player_id: Option<String>) -> lisa_error::Result<()> {
         // None : Remove Player id
         match &player_id {
             None => {
@@ -122,11 +150,11 @@ impl Player for ParsedPlayer {
         }
     }
 
-    fn refrash_info(&mut self) -> PResult<()> {
+    fn refrash_info(&mut self) -> lisa_error::Result<()> {
         match &self.player_id {
-            None => Err(ParseError::new(
-                "not saved user info".to_string(),
-                ParseError::Kind::DataError,
+            None => Err(lisa_error::new(
+                "not saved user info",
+                lisa_error::Kind::DataError,
             )),
             Some(id) => match get_user_name(id.to_string()) {
                 Ok(string) => {
