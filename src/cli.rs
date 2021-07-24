@@ -1,7 +1,6 @@
 use std::io;
 
-use crate::page::{game_record, matches, my, profile, set, Command};
-use crate::util::history;
+use crate::page::Command;
 
 pub fn cli_arg(arg1: String, args: Vec<String>) -> bool {
     Command::from_str(&arg1).run_cli(args);
