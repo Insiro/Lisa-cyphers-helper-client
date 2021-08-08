@@ -1,7 +1,10 @@
 use crate::client::get_client;
 
-pub fn cli(mut arg: Vec<String>) {
+pub fn cli(mut _arg: Vec<String>) {
     
 
-    let mut client = get_client();
+    let mut _client = get_client();
+}
+pub fn help(_args:Vec<String>){
+
 }

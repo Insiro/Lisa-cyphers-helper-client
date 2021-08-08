@@ -1,6 +1,6 @@
-use crate::object::{charactor::Charactor, player::ParsedPlayer};
+use crate::object::{charactor::Charactor, player::Info};
 pub struct PlayerInfo {
-    player: ParsedPlayer,
+    player: Info,
     kill: u8,
     death: u8,
     assist: u8,
@@ -14,7 +14,7 @@ pub struct PlayerInfo {
 impl PlayerInfo {
     pub fn dumy() -> PlayerInfo {
         PlayerInfo {
-            player: ParsedPlayer::dumy(),
+            player: Info::dumy(),
             attack_point: 0,
             kill: 0,
             death: 0,
@@ -25,7 +25,7 @@ impl PlayerInfo {
             charactor: Charactor::dumy(),
         }
     }
-    pub fn search(id: &str) -> PlayerInfo {
+    pub fn search(_id: &str) -> PlayerInfo {
         PlayerInfo::dumy()
     }
 }
@@ -67,11 +67,11 @@ impl MatchInfo {
     }
     pub fn cli(&self) {}
 }
-pub fn get_match(id: &str) -> MatchInfo {
+pub fn get_match(_id: &str) -> MatchInfo {
     MatchInfo::dumy()
 }
 
-pub fn cli(mut args: Vec<String>) {}
+pub fn cli(mut _args: Vec<String>) {}
 
 pub fn cls() {
     loop {
@@ -85,3 +85,4 @@ pub fn cls() {
         }
     }
 }
+pub fn help(_args: Vec<String>) {}

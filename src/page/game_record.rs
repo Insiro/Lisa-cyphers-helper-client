@@ -1,38 +1,42 @@
 use std::io;
 
-use crate::object::charactor::Charactor;
-use crate::object::player::{self, Player};
+// use crate::object::charactor::Charactor;
+use crate::object::player::Info;
 use crate::page::matches;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct GameRecord {
-    player: player::ParsedPlayer,
+    player: Info,
     records: Vec<GameInfo>,
 }
 impl GameRecord {
-    pub fn get_player(&mut self) -> &player::ParsedPlayer {
+    pub fn get_player(&mut self) -> &Info {
         &self.player
     }
     pub fn get_records(&mut self) -> &Vec<GameInfo> {
         &self.records
     }
     pub fn cli(&mut self) {
-        let player_name = self.player.get_player_name();
+        let player_name = self.player.nickname();
         let mut mat_str = String::new();
         let mut i = 0;
         for mat in self.records.iter() {
             mat_str += format!("{}  {}\t{}\n", i, mat.get_type().as_str(), mat.is_win).as_str();
             i = i + 1;
         }
-        let mut it = true;
         let mut select = String::new();
-        let mut selected: i8;
-        while it {
+        let mut _selected: i8 = 0;
+        loop {
             print!("{esc}c", esc = 27 as char);
             println!("player Name : {}", player_name);
             print!("matches\n{}", mat_str);
-            io::stdin().read_line(&mut select);
+            match io::stdin().read_line(&mut select) {
+                Err(_) => {
+                    continue;
+                }
+                Ok(_) => {}
+            }
             match select.trim().parse::<i8>() {
                 Err(_) => {
                     println!("wrong select");
@@ -43,7 +47,6 @@ impl GameRecord {
                     continue;
                 }
                 Ok(ok) if ok == -1 => {
-                    it = false;
                     break;
                 }
                 Ok(ok) => match self.records.get(usize::from(ok.unsigned_abs())) {
@@ -61,11 +64,11 @@ impl GameRecord {
 }
 pub fn dumy() -> GameRecord {
     GameRecord {
-        player: player::ParsedPlayer::dumy(),
+        player: Info::dumy(),
         records: vec![],
     }
 }
-pub fn search(id: &str) -> Option<GameRecord> {
+pub fn search(_id: &str) -> Option<GameRecord> {
     //TODO: search by api
     Some(dumy())
 }
@@ -115,10 +118,11 @@ pub fn cli(mut args: Vec<String>) {
         None => cli_main(),
         Some(arg) => match search(&arg) {
             None => {}
-            Some(re) => {}
+            Some(_re) => {}
         },
     }
 }
 
 fn cli_main() {}
 fn cli_searched() {}
+pub fn help(_args: Vec<String>) {}

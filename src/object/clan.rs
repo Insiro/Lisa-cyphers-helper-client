@@ -1,20 +1,18 @@
 use webbrowser;
 
 use crate::error as lisa_error;
+use getset::Getters;
 use reqwest;
 use select::document::Document;
 use select::predicate::Class;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Getters)]
 pub struct ClanBase {
+    #[getset(get, set)]
     name: String,
+    #[getset(get, set)]
     post_url: Option<String>,
-}
-pub trait Clan {
-    fn get_clan(&self) -> &Option<ClanBase>;
-    fn set_clan(&mut self, clan: Option<ClanBase>);
-    fn remove_clan(&mut self);
 }
 
 impl ClanBase {
@@ -51,9 +49,6 @@ impl ClanBase {
         }
         Ok(accessing_members)
     }
-    pub fn get_clan_name(&self) -> &str {
-        &self.name
-    }
     pub fn get_clan_url(&self) -> &Option<String> {
         &self.post_url
     }
@@ -66,11 +61,5 @@ impl ClanBase {
                 true
             }
         }
-    }
-    pub fn set_clan_name(&mut self, name: String) {
-        self.name = name;
-    }
-    pub fn set_clan_url(&mut self, post_url: String) {
-        self.post_url = Some(post_url);
     }
 }

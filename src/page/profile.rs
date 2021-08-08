@@ -6,7 +6,7 @@ use std::path::Path;
 
 use crate::object::{charactor, player};
 use crate::util::data_serializer::date_se;
-use player::{Gender, ParsedPlayer};
+use player::{Gender, Info};
 
 type UtcTime = Option<DateTime<Utc>>;
 
@@ -14,7 +14,7 @@ pub fn gui() {}
 
 #[derive(Serialize, Deserialize)]
 pub struct Profile {
-    player: ParsedPlayer,
+    player: Info,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
@@ -25,7 +25,7 @@ pub struct Profile {
 
 pub fn dumy() -> Profile {
     Profile {
-        player: ParsedPlayer::dumy(),
+        player: Info::dumy(),
         memo: None,
         gender: Gender::Unknown,
         name: None,
@@ -34,7 +34,7 @@ pub fn dumy() -> Profile {
     }
 }
 pub fn new(
-    player: ParsedPlayer,
+    player: Info,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
@@ -52,26 +52,26 @@ pub fn new(
 }
 
 impl Profile {
-    pub fn get_player(&self) -> &ParsedPlayer {
+    pub fn get_player(&self) -> &Info {
         &self.player
     }
     pub fn get_positions(&self) -> &charactor::CharList {
         &self.position
     }
-    pub fn set_birthday(&mut self, birthday: String) -> bool {
+    pub fn set_birthday(&mut self, _birthday: String) -> bool {
         //TODO:: set birth day from string
         false
     }
     pub fn set_memo(&mut self, memo: String) {
         self.memo = Some(memo);
     }
-    pub fn Save(&self) -> Result<(), String> {
+    pub fn save(&self) -> Result<(), String> {
         //TODO: save to db 1) check have saved data 2) create or override data
         Ok(())
     }
 }
 
-pub fn search(keyword: &str) -> Profile {
+pub fn search(_keyword: &str) -> Profile {
     dumy()
 }
 
@@ -89,4 +89,5 @@ pub fn load(dir: &str) -> Result<Profile, String> {
     }
 }
 
-pub fn cli(mut args: Vec<String>) {}
+pub fn cli(mut _args: Vec<String>) {}
+pub fn help(_args: Vec<String>) {}

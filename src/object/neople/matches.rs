@@ -1,3 +1,4 @@
+#![allow(dead_code, non_snake_case)]
 use super::info;
 pub struct Matches {
     date: String,
@@ -19,7 +20,7 @@ pub struct Player {
     items: Vec<info::Item>,
 }
 impl Matches {
-    fn get_members(isWin: bool) -> Vec<String> {
+    fn get_members(_is_win: bool) -> Vec<String> {
         //TODO:fill
         return vec![];
     }

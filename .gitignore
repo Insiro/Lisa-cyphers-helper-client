@@ -20,3 +20,7 @@ Cargo.lock
 **/private.rs
 goorm.manifest
 reqData/
+
+# update macro
+/update/target/
+.config

@@ -22,6 +22,8 @@ pub struct Notify {
     date: Option<UtcTime>,
 }
 
+//TODO: notify parser
+#[allow(dead_code)]
 impl Notify {
     fn dumy() -> Notify {
         Notify {
@@ -31,21 +33,22 @@ impl Notify {
             date: None,
         }
     }
-    fn parse_app(url: &str) -> Vec<Notify> {
+    
+    fn parse_app(_url: &str) -> Vec<Notify> {
         vec![Notify::dumy()]
     }
     fn update_cyphers() -> Vec<Notify> {
         vec![Notify::dumy()]
     }
-    fn parse_cyphers(kind: Kind, time: UtcTime) -> Vec<Notify> {
-        let mut url: &str;
-        url = match &kind {
+    fn parse_cyphers(kind: Kind, _time: UtcTime) -> Vec<Notify> {
+        let mut _url: String = match &kind {
             Kind::CyphersUpdate => "http://cyphers.nexon.com/cyphers/article/update/rss",
             Kind::Event => "http://cyphers.nexon.com/cyphers/article/event/rss",
             Kind::Magagine => "http://cyphers.nexon.com/cyphers/article/magazine/rss",
             Kind::CyphersNotic => "http://cyphers.nexon.com/cyphers/article/notice/rss",
             _ => return vec![],
-        };
+        }
+        .to_string();
         //TODO: parse description and
         vec![Notify::dumy()]
     }

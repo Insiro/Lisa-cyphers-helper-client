@@ -1,8 +1,9 @@
+#![allow(dead_code, non_snake_case)]
 use crate::error as lisa_error;
 use crate::util::temp;
 use serde::{Deserialize, Serialize};
 use serde_json;
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct User {
     rank: u8,
     playerId: String,
@@ -22,11 +23,12 @@ pub fn search(id: &str) -> lisa_error::Result<User> {
     return match value {
         Err(_) => Err(lisa_error::new(
             "failed to load data",
-            lisa_error::Kind::DataError,
+            lisa_error::Kind::DataLoadError,
         )),
-        Ok(rank) => Ok(rank.rows[0]),
+        Ok(rank) => Ok(rank.rows[0].clone()),
     };
 }
+
 pub fn get(offset: u8, limit: u8) -> lisa_error::Result<Vec<User>> {
     //limit to 1000
     let parsed = temp::parse::ranking_list(offset, limit);
@@ -39,5 +41,7 @@ pub fn get(offset: u8, limit: u8) -> lisa_error::Result<Vec<User>> {
         Ok(rank) => Ok(rank.rows),
     };
 }
-pub struct charactor {}
-pub struct tsj {}
+
+//TODO: put Character and Tsj(투신전) impliments
+pub struct Charactor {}
+pub struct Tsj {}

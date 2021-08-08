@@ -4,11 +4,15 @@ pub mod servicer;
 pub mod object {
     pub mod charactor;
     pub mod clan;
+    pub mod neople;
     pub mod notify;
     pub mod player;
+    pub trait Objects {
+        fn refrash(&mut self) -> super::error::Result<()>;
+    }
 }
 pub mod cli;
 pub mod error;
 pub mod page;
 pub mod util;
-pub mod neople;
+extern crate getset;
