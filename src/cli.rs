@@ -1,6 +1,11 @@
+use crate::command::Command;
 use std::io;
-
-use crate::page::Command;
+pub trait CLI {
+    fn cli(args: Vec<String>) -> Command;
+    fn help(args: Vec<String>);
+    fn cli_main();
+    fn comm() -> Command;
+}
 
 pub fn cli_arg(arg1: String, args: Vec<String>) -> bool {
     Command::from_str(&arg1).run_cli(args);
@@ -10,14 +15,18 @@ pub fn cli_arg(arg1: String, args: Vec<String>) -> bool {
 pub fn cli() {
     let mut cmd: Command = Command::Main;
     while cmd != Command::Exit {
+        print!("{} > ", cmd.as_str());
         let mut args = get_args();
         let fst = match args.pop() {
             None => {
+                println!("wrong input");
                 continue;
             }
             Some(it) => it,
         };
-        cmd = Command::from_str(&fst);
+        if cmd == Command::Err {
+            cmd = Command::from_str(&fst);
+        }
         cmd = cmd.run_cli(args);
     }
 }
@@ -34,11 +43,5 @@ fn get_args() -> Vec<String> {
     args
 }
 
-pub fn start(mut args: Vec<String>) {
-    match args.pop() {
-        Some(arg) => {
-            Command::from_str(&arg).run_cli(args);
-        }
-        None => cli(),
-    }
-}
+pub struct Cli();
+pub fn load(_args: Vec<String>) {}

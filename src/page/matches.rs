@@ -71,7 +71,11 @@ pub fn get_match(_id: &str) -> MatchInfo {
     MatchInfo::dumy()
 }
 
-pub fn cli(mut _args: Vec<String>) {}
+use crate::command::Command;
+
+pub fn cli(mut _args: Vec<String>) -> Command {
+    Command::NotImpletated
+}
 
 pub fn cls() {
     loop {

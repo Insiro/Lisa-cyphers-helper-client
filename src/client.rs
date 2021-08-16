@@ -4,6 +4,7 @@ use crate::object::player;
 
 use crate::util::{data_serializer::date_se, history, temp};
 use chrono::{DateTime, Utc};
+use getset::{Getters, Setters};
 use reqwest;
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -20,11 +21,15 @@ type RcClient = Rc<RefCell<Client>>;
 static mut STATIC_CLIENT: Option<RcClient> = None;
 static mut REQ_CLIENT: Option<Rc<RefCell<reqwest::Client>>> = None;
 static mut HISTORY: Option<Rc<RefCell<history::Histories>>> = None;
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Getters, Setters)]
 pub struct Client {
     //setting data
+    #[getset(get, set)]
     pub auto_start: bool,
+    #[getset(get, set)]
     pub is_nexon: bool,
+    #[getset(get)]
+    pub version: String,
     //news data
     #[serde(with = "date_se")]
     last_notify: Option<UtcTime>,
@@ -37,12 +42,15 @@ pub struct Client {
     #[serde(with = "date_se")]
     birth_day: Option<UtcTime>,
     clans: Vec<clan::ClanBase>,
+    #[getset(get)]
     charactors: CharList,
+    #[getset(get, set)]
     neople_api_key: String,
 }
 
 fn empty_client() -> Client {
     Client {
+        version: "0.0.0".to_string(),
         auto_start: false,
         is_nexon: true,
         players: Vec::new(),
@@ -74,10 +82,22 @@ fn new_client() -> Client {
         )
         .expect("failed to save file");
     }
-    println!("{}", serde_json::to_string(&client).expect("err"));
     client
 }
-
+pub fn start_msg() {
+    let client = match get_client() {
+        None => panic!(),
+        Some(a) => a,
+    };
+    println!("start as cli");
+    println!("---setting---");
+    println!("lisa - version : {}", client.borrow().version());
+    println!("access as nexon : {}", client.borrow().is_nexon);
+    println!("----feed infos----");
+    //TODO: print last update magazine, update, notify as date
+    // println!("magazine : {}", client.get_last_magazine());
+    println!("---------");
+}
 pub fn init() {
     unsafe {
         REQ_CLIENT = Some(Rc::new(RefCell::new(reqwest::Client::new())));
@@ -101,10 +121,18 @@ pub fn get_req_client() -> Option<Rc<RefCell<reqwest::Client>>> {
         }
     }
 }
-impl Client {
-    fn get_api_key(&self) -> &str {
-        &self.neople_api_key
+pub fn get_history() -> Option<Rc<RefCell<history::Histories>>> {
+    unsafe {
+        match &HISTORY {
+            None => None,
+            Some(his) => Some(Rc::clone(&his)),
+        }
     }
+}
+
+//TODO: remove dead_code notation
+#[allow(dead_code)]
+impl Client {
     fn open_game_page(&self) {
         //TODO: open webBrowser
     }
@@ -114,21 +142,7 @@ impl Client {
     fn get_clans(&mut self) -> &mut Vec<clan::ClanBase> {
         &mut self.clans
     }
-    fn set_home_type(&mut self, is_nexon: bool) {
-        self.is_nexon = is_nexon
-    }
     fn get_birth_day(&self) -> &Option<UtcTime> {
         &self.birth_day
-    }
-    fn get_charactors(&mut self) -> &CharList {
-        &self.charactors
-    }
-}
-pub fn get_history() -> Rc<RefCell<history::Histories>> {
-    unsafe {
-        match &HISTORY {
-            None => panic!(""),
-            Some(his) => Rc::clone(&his),
-        }
     }
 }

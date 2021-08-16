@@ -16,9 +16,10 @@ pub struct ClanBase {
 }
 
 impl ClanBase {
+    //TODO:remove dumy
     pub fn dumy() -> ClanBase {
         ClanBase {
-            name: "".to_string(),
+            name: "dumy".to_string(),
             post_url: None,
         }
     }

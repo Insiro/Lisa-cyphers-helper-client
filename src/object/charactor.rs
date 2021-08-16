@@ -7,9 +7,10 @@ pub struct Charactor {
 }
 pub type CharList = Vec<Charactor>;
 impl Charactor {
+    //TODO: remove
     pub fn dumy() -> Charactor {
         Charactor {
-            name: "asdasd".to_string(),
+            name: "dumy".to_string(),
             position: 0,
             prev_img: None,
         }

@@ -113,7 +113,9 @@ impl GameInfo {
     }
 }
 
-pub fn cli(mut args: Vec<String>) {
+use crate::command::Command;
+
+pub fn cli(mut args: Vec<String>) -> Command {
     match args.pop() {
         None => cli_main(),
         Some(arg) => match search(&arg) {
@@ -121,8 +123,8 @@ pub fn cli(mut args: Vec<String>) {
             Some(_re) => {}
         },
     }
+    Command::NotImpletated
 }
 
 fn cli_main() {}
-fn cli_searched() {}
 pub fn help(_args: Vec<String>) {}

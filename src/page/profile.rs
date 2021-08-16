@@ -69,10 +69,9 @@ impl Profile {
         //TODO: save to db 1) check have saved data 2) create or override data
         Ok(())
     }
-}
-
-pub fn search(_keyword: &str) -> Profile {
-    dumy()
+    pub fn search(_keyword: &str) -> Option<Profile> {
+        None
+    }
 }
 
 pub fn load(dir: &str) -> Result<Profile, String> {
@@ -88,6 +87,54 @@ pub fn load(dir: &str) -> Result<Profile, String> {
         },
     }
 }
+use crate::command::Command;
 
-pub fn cli(mut _args: Vec<String>) {}
+#[derive(PartialEq)]
+enum Commands {
+    Get,
+    Remove,
+    Others,
+    Help,
+    Load,
+}
+impl Commands {
+    fn from_str(com: &str) -> Commands {
+        match com.trim() {
+            "get" => Commands::Get,
+            "help" => Commands::Help,
+            "load" => Commands::Load,
+            _ => Commands::Others,
+        }
+    }
+}
+pub fn cli(mut args: Vec<String>) -> Command {
+    match args.pop() {
+        None => cli_main(),
+        Some(command) => {
+            let com = Commands::from_str(&command);
+            match com {
+                Commands::Others => return Command::from_str(&command),
+                Commands::Help => {
+                    help(args);
+                    Command::Help
+                }
+                Commands::Get => match args.pop() {
+                    Some(key) => match Profile::search(&key) {
+                        None => {
+                            println!("not founed on saved profile");
+                            Command::Profile
+                        }
+                        Some(profile) => Command::Some,
+                    },
+                    None => Command::Profile,
+                },
+                Commands::Remove | Commands::Load => Command::NotImpletated,
+            }
+        }
+    }
+}
 pub fn help(_args: Vec<String>) {}
+fn cli_main() -> Command {
+    //TODO: impl
+    Command::NotImpletated
+}
