@@ -13,6 +13,7 @@ pub enum Command {
     Err,
     NotImpletated,
     Some,
+    Back,
 }
 
 impl Command {
@@ -26,6 +27,9 @@ impl Command {
             Command::Main => "Main",
             Command::Help => "Help",
             Command::Profile => "Profile",
+            Command::Back => "Back",
+            Command::Some => "Some",
+            Command::NotImpletated => "NotImplied",
             Command::Err | _ => "Err",
         }
     }
@@ -38,6 +42,7 @@ impl Command {
             Command::Set => set::help(args),
             Command::Help => println!("help <command> for detailes"),
             Command::Profile => profile::help(args),
+            Command::Back => println!("return to previous level"),
             _ => println!("Wrong Command"),
         };
     }
@@ -60,15 +65,16 @@ impl Command {
                 println!("not impletated");
                 Command::NotImpletated
             }
-            Command::Err => {
-                println!("Wrong Command");
-                Command::Err
-            }
             Command::Exit => Command::Exit,
             Command::Some => match client::get_history() {
                 None => panic!(),
                 Some(his) => his.borrow_mut().run_cli(),
             },
+            Command::Back => Command::Back,
+            Command::Err => {
+                println!("Wrong Command");
+                Command::Err
+            }
         };
 
         ret
@@ -83,16 +89,14 @@ impl Command {
             "set" | "setting" => Command::Set,
             "my" => Command::My,
             "main" => Command::Main,
+            "back" => Command::Back,
             _ => Command::Err,
         }
     }
 }
 fn help(mut args: Vec<String>) {
-    let command_list = [
-        "exit", "commands", "help", "command", "my", "profile", "record", "match", "setting",
-    ];
     match args.pop() {
-        None => {}
+        None => help_sub(),
         Some(ar) => {
             let cmd = Command::from_str(&ar);
             match &cmd {
@@ -101,15 +105,44 @@ fn help(mut args: Vec<String>) {
                 | Command::Set
                 | Command::Matchs
                 | Command::User
-                | Command::My => {
-                    cmd.help(args);
-                }
+                | Command::My => cmd.help(args),
                 _ => {
-                    for item in command_list.iter() {
-                        println!("{}", item);
-                    }
+                    if cmd == Command::Err && "Info" == ar.trim() {
+                        maker_info();
+                        return;
+                    };
+                    help_sub();
                 }
-            }
+            };
         }
     };
+}
+fn help_sub() {
+    let items = [
+        "Exit",
+        "My",
+        "User",
+        "Matchs",
+        "Set",
+        "Main",
+        "Help",
+        "Profile",
+        "Back",
+        "help Info",
+    ];
+    println!("Lisa : Cyphers Helper");
+    println!("auto game history search | manage friends profile | clan information");
+    println!("-Command List-");
+    for item in items.iter() {
+        println!("{}", item);
+    }
+}
+fn maker_info() {
+    println!("Project Lisa");
+    println!("Lisa: Cyphers Helper (client ver)");
+    println!("\thttps://github.com/Insiro/Lisa-cyphers-helper-client");
+    println!("Developed by Insiro :\thttps://github.com/Insiro");
+    println!("Project Lisa : \thttps://lisa.Insiro.me/");
+    println!("------------------------------------------------------------");
+    println!("Powered by neople api : \nhttps://developers.neople.co.kr/");
 }

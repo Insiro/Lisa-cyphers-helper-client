@@ -1,4 +1,7 @@
-# CyphersHelper (temp)
+# Lisa : Cyphers helper (Client)
+
+## Project Lisa
+https://lisa.insiro.me
 
 #### Index
 1. [Progress View](#progress-view)
@@ -9,6 +12,7 @@
 |feature|status|
 |--|--|
 |record Search|x|
+|search from screen shot|x|
 |match Search|x|
 |loading Search|x|
 |clan info|x|
@@ -43,3 +47,5 @@
 
 
 
+### Others
+Powered by [Neople Open API] (https://developers.neople.co.kr/)
