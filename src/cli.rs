@@ -1,47 +1,79 @@
-use crate::command::Command;
-use std::io;
-pub trait CLI {
-    fn cli(args: Vec<String>) -> Command;
-    fn help(args: Vec<String>);
-    fn cli_main();
-    fn comm() -> Command;
+use crate::{client, command::Command};
+use std::{io, process};
+pub trait CliTrait {
+    fn cli_runner(&mut self) -> Command;
 }
 
-pub fn cli_arg(arg1: String, args: Vec<String>) -> bool {
-    Command::from_str(&arg1).run_cli(args);
-    false
-}
-
-pub fn cli() {
-    let mut cmd: Command = Command::Main;
-    while cmd != Command::Exit {
-        print!("{} > ", cmd.as_str());
-        let mut args = get_args();
-        let fst = match args.pop() {
-            None => {
-                println!("wrong input");
-                continue;
-            }
-            Some(it) => it,
-        };
-        if cmd == Command::Err {
-            cmd = Command::from_str(&fst);
+pub fn start_cli(com: String) {
+    match com.as_str() {
+        "--load" => {
+            //TODO: load data
+            return;
         }
-        cmd = cmd.run_cli(args);
+        "--cli" => {
+            client::init();
+            let mut cli = CliController::new();
+            cli.start();
+        }
+        _ => {
+            println!("wrong command : {}", com);
+            return;
+        }
     }
 }
 
-fn get_args() -> Vec<String> {
-    let mut line: String = String::new();
-    io::stdin().read_line(&mut line).expect("error read");
-    line = line.to_lowercase();
-    let mut args: Vec<String> = Vec::new();
-    for item in line.split(" ") {
-        args.push(item.to_string());
-    }
-    args.reverse();
-    args
+struct CliController {
+    command_env: Command,
+    env: Box<dyn CliTrait>,
 }
-
+impl CliController {
+    pub fn new() -> CliController {
+        let cli = CliController {
+            command_env: Command::Main,
+            env: Box::new(MainPage::new()),
+        };
+        return cli;
+    }
+    pub fn start(&mut self) {
+        loop {
+            self.cmd_runner();
+        }
+    }
+    fn cmd_runner(&mut self) {
+        if &self.command_env == &Command::Exit {
+            process::exit(0);
+        }
+        self.print_env();
+        self.env.cli_runner();
+    }
+    fn print_env(&self) {
+        println!("{} > ", self.command_env.as_str());
+        //TODO: print Currunt Env Enformation
+    }
+}
+struct MainPage {
+    command_env: Command,
+}
+impl MainPage {
+    pub fn new() -> MainPage {
+        return MainPage {
+            command_env: Command::Main,
+        };
+    }
+    fn set_command(&mut self) {
+        let mut line: String = String::new();
+        io::stdin().read_line(&mut line).expect("error read");
+        line = line.to_lowercase();
+        line = line.trim().to_string();
+        let coms: Vec<&str> = line.split(" ").collect();
+        self.command_env = Command::from_str(coms[0]);
+    }
+}
+impl CliTrait for MainPage {
+    fn cli_runner(&mut self) -> Command {
+        self.set_command();
+        return self.command_env.clone();
+    }
+}
 pub struct Cli();
 pub fn load(_args: Vec<String>) {}
