@@ -1,6 +1,6 @@
 use crate::client;
 use crate::page::*;
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum Command {
     Exit,
     My,
