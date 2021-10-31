@@ -1,89 +1,115 @@
-use crate::object::charactor::CharList;
-use crate::object::clan;
-use crate::object::player;
-
-use crate::util::{data_serializer::date_se, history, temp};
-use chrono::{DateTime, Utc};
-use getset::{Getters, Setters};
+use crate::util::{history, temp};
+use cargo_metadata::MetadataCommand;
 use reqwest;
-use serde::{Deserialize, Serialize};
-use serde_json;
-use std::cell::RefCell;
-use std::fs;
+use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
 use std::rc::Rc;
+use std::{cell::RefCell, fs};
 
-type UtcTime = DateTime<Utc>;
+mod setting;
+mod subscription;
+#[cfg(test)]
+mod test;
+mod userinfo;
 
 type RcClient = Rc<RefCell<Client>>;
 
 static mut STATIC_CLIENT: Option<RcClient> = None;
 static mut REQ_CLIENT: Option<Rc<RefCell<reqwest::Client>>> = None;
 static mut HISTORY: Option<Rc<RefCell<history::Histories>>> = None;
-#[derive(Serialize, Deserialize, Getters, Setters)]
+
+trait Save: Sized {
+    fn new(path: &Path) -> Self;
+    fn save(&self) -> Result<(), Box<dyn std::error::Error>>;
+    fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>>;
+}
+trait ClientSave: Serialize {
+    fn create(data: &Self, path: &Path) {
+        match Self::write_file(data, path) {
+            Err(_) => {
+                let d_path = Self::get_default_path();
+                let path = Path::new(&d_path);
+                Self::write_file(data, path).expect("failed to save data");
+            }
+            _ => {}
+        };
+    }
+    fn write_file(data: &Self, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+        let mut file = fs::File::create(path)?;
+        file.write_all(serde_json::to_string(&data)?.as_bytes())?;
+        return Ok(());
+    }
+    fn default() -> Self;
+    fn get_default_path() -> String;
+    fn print_start_msg(&self);
+}
 pub struct Client {
-    //setting data
-    #[getset(get, set)]
-    pub auto_start: bool,
-    #[getset(get, set)]
-    pub is_nexon: bool,
-    #[getset(get)]
-    pub version: String,
-    //news data
-    #[serde(with = "date_se")]
-    last_notify: Option<UtcTime>,
-    #[serde(with = "date_se")]
-    last_magazine: Option<UtcTime>,
-    #[serde(with = "date_se")]
-    last_update: Option<UtcTime>,
-    // user data
-    players: Vec<player::PlayerBase>,
-    #[serde(with = "date_se")]
-    birth_day: Option<UtcTime>,
-    clans: Vec<clan::ClanBase>,
-    #[getset(get)]
-    charactors: CharList,
-    #[getset(get, set)]
-    neople_api_key: String,
+    pub setting: setting::Setting,
+    meta: ClientMeta,
+    pub user: userinfo::UserInfo,
+    pub subscription: subscription::Subscription,
+    pub config_path: String,
 }
+impl Client {
+    pub fn new() -> Self {
+        let setting_path_str = temp::get_config_path();
+        let setting_path = Path::new(setting_path_str.as_str());
+        let setting = setting::Setting::new(setting_path);
+        let raw_path = (&setting.conf_path).to_string();
+        let config_path = Path::new(&raw_path);
 
-fn empty_client() -> Client {
-    Client {
-        version: "0.0.0".to_string(),
-        auto_start: false,
-        is_nexon: true,
-        players: Vec::new(),
-        birth_day: None,
-        charactors: Vec::new(),
-        clans: Vec::new(),
-        last_notify: None,
-        last_magazine: None,
-        last_update: None,
-        neople_api_key: "".to_string(),
+        Self {
+            setting,
+            meta: ClientMeta::new(),
+            user: userinfo::UserInfo::new(config_path),
+            subscription: subscription::Subscription::new(config_path),
+            config_path: raw_path,
+        }
+    }
+    pub fn print_start_msg(&self) {
+        println!("start as cli");
+        println!("---setting---");
+        println!("lisa - version : {}", self.meta.get_version());
+        self.setting.print_start_msg();
+        println!("----feed infos----");
+        self.subscription.print_start_msg();
+        println!("---------");
     }
 }
 
-fn new_client() -> Client {
-    let pstr = temp::get_config_path();
-    let path = Path::new(pstr.as_str());
-    let client: Client;
-    let serial: String;
-    if path.exists() {
-        serial = fs::read_to_string(path).expect("failed to open config file");
-        client = serde_json::from_str(&serial).expect("failed to DeSerialize");
-    } else {
-        let mut conf = fs::File::create(path).expect("failed to create config file");
-        client = empty_client();
-        conf.write_all(
-            serde_json::to_string(&client)
-                .expect("faild to serialize")
-                .as_bytes(),
-        )
-        .expect("failed to save file");
-    }
-    client
+pub struct ClientMeta {
+    version: String,
 }
+impl Default for ClientMeta {
+    fn default() -> Self {
+        return Self::new();
+    }
+}
+
+impl ClientMeta {
+    pub fn new() -> Self {
+        //TODO: check It work
+        return Self {
+            version: Self::load(),
+        };
+    }
+    fn get_version(&self) -> &str {
+        &self.version
+    }
+    fn load() -> String {
+        let path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+        let meta = MetadataCommand::new()
+            .manifest_path("./Cargo.toml")
+            .current_dir(&path)
+            .exec()
+            .unwrap();
+        let root = meta.root_package().unwrap();
+        let version = (&root.version).to_string();
+        return version;
+    }
+}
+
 pub fn start_msg() {
     let client = match get_client() {
         None => panic!(),
@@ -91,8 +117,9 @@ pub fn start_msg() {
     };
     println!("start as cli");
     println!("---setting---");
-    println!("lisa - version : {}", client.borrow().version());
-    println!("access as nexon : {}", client.borrow().is_nexon);
+    println!("lisa - version : {}", client.borrow().meta.get_version());
+
+    println!("access as nexon : {}", client.borrow().setting.is_nexon);
     println!("----feed infos----");
     //TODO: print last update magazine, update, notify as date
     // println!("magazine : {}", client.get_last_magazine());
@@ -101,7 +128,7 @@ pub fn start_msg() {
 pub fn init() {
     unsafe {
         REQ_CLIENT = Some(Rc::new(RefCell::new(reqwest::Client::new())));
-        STATIC_CLIENT = Some(Rc::new(RefCell::new(new_client())));
+        STATIC_CLIENT = Some(Rc::new(RefCell::new(Client::new())));
         HISTORY = Some(Rc::new(RefCell::new(history::init())));
     }
 }
@@ -131,6 +158,7 @@ pub fn get_history() -> Option<Rc<RefCell<history::Histories>>> {
 }
 
 //TODO: remove dead_code notation
+/*
 #[allow(dead_code)]
 impl Client {
     fn open_game_page(&self) {
@@ -146,3 +174,4 @@ impl Client {
         &self.birth_day
     }
 }
+*/
