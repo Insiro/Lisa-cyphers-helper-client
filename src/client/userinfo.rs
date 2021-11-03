@@ -19,6 +19,7 @@ pub struct UserInfo {
     birth_day: Option<UtcTime>,
     clans: Vec<clan::ClanBase>,
     charactors: CharList,
+    self_path:String
 }
 impl Save for UserInfo {
     fn new(path: &Path) -> Self {
@@ -26,7 +27,7 @@ impl Save for UserInfo {
             Ok(ok) => ok,
             Err(_) => {
                 let default = Self::default();
-                Self::create(&default, path);
+                Self::create(&default, &path.join("user"));
                 default
             }
         }
@@ -50,16 +51,26 @@ impl ClientSave for UserInfo {
             birth_day: None,
             clans: Vec::new(),
             charactors: Vec::new(),
+            self_path:Self::get_default_path()
         }
     }
 
     fn get_default_path() -> String {
         let mut path = temp::get_config_path();
-        path.push_str("/user");
+        path.push_str("user");
         path
     }
 
     fn print_start_msg(&self) {
         todo!();
+    }
+
+    fn set_path(&mut self, new_path: &str) -> Result<(), ()> {
+        let path = Path::new(new_path);
+        if path.exists() {
+            self.self_path = new_path.to_string();
+            return Ok(());
+        }
+        return Err(());
     }
 }

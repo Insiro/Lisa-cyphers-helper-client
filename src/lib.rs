@@ -18,5 +18,5 @@ pub mod util;
 extern crate getset;
 
 pub fn gui() {
-    client::init();
+    client::Client::new();
 }

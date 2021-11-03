@@ -15,6 +15,7 @@ pub struct Subscription {
     last_magazine: Option<UtcTime>,
     #[serde(with = "date_se")]
     last_update: Option<UtcTime>,
+    self_path:String
 }
 impl Save for Subscription {
     fn new(path: &Path) -> Self {
@@ -22,7 +23,7 @@ impl Save for Subscription {
             Ok(ok) => ok,
             Err(_) => {
                 let default = Self::default();
-                Self::create(&default, path);
+                Self::create(&default, &path.join("subscription"));
                 default
             }
         }
@@ -45,12 +46,13 @@ impl ClientSave for Subscription {
             last_notify: Some(Utc::now()),
             last_magazine: Some(Utc::now()),
             last_update: Some(Utc::now()),
+            self_path:Self::get_default_path()
         }
     }
 
     fn get_default_path() -> String {
         let mut path = temp::get_config_path();
-        path.push_str("/subscription");
+        path.push_str("subscription");
         path
     }
 
@@ -64,5 +66,13 @@ impl ClientSave for Subscription {
         if self.last_update.is_some() {
             println!("update\t{}", &self.last_update.unwrap());
         }
+    }
+    fn set_path(&mut self, new_path: &str) -> Result<(), ()> {
+        let path = Path::new(new_path);
+        if path.exists() {
+            self.self_path = new_path.to_string();
+            return Ok(());
+        }
+        return Err(());
     }
 }
