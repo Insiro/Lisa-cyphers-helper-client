@@ -21,6 +21,4 @@ Cargo.lock
 goorm.manifest
 reqData/
 
-# update macro
-/update/target/
-.config
+.config/
