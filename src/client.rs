@@ -1,24 +1,19 @@
 use crate::util::{history, temp};
-use cargo_metadata::MetadataCommand;
-use reqwest;
 use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
 use std::rc::Rc;
+use std::sync::RwLock;
 use std::{cell::RefCell, fs};
 
+mod meta;
 mod setting;
 mod subscription;
-#[cfg(test)]
-mod test;
 mod userinfo;
 
-type RcClient = Rc<RefCell<Client>>;
-
-static mut STATIC_CLIENT: Option<RcClient> = None;
-static mut REQ_CLIENT: Option<Rc<RefCell<reqwest::Client>>> = None;
+type RwLockCLient = Rc<RefCell<RwLock<Client>>>;
 static mut HISTORY: Option<Rc<RefCell<history::Histories>>> = None;
-
+static mut CLIENT: Option<RwLockCLient> = None;
 trait Save: Sized {
     fn new(path: &Path) -> Self;
     fn save(&self) -> Result<(), Box<dyn std::error::Error>>;
@@ -38,15 +33,18 @@ trait ClientSave: Serialize {
     fn write_file(data: &Self, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
         let mut file = fs::File::create(path)?;
         file.write_all(serde_json::to_string(&data)?.as_bytes())?;
+        file.sync_data()?;
         return Ok(());
     }
     fn default() -> Self;
     fn get_default_path() -> String;
     fn print_start_msg(&self);
+    fn set_path(&mut self, new_path: &str) -> Result<(), ()>;
 }
+
 pub struct Client {
     pub setting: setting::Setting,
-    meta: ClientMeta,
+    meta: meta::Meta,
     pub user: userinfo::UserInfo,
     pub subscription: subscription::Subscription,
     pub config_path: String,
@@ -56,12 +54,12 @@ impl Client {
         let setting_path_str = temp::get_config_path();
         let setting_path = Path::new(setting_path_str.as_str());
         let setting = setting::Setting::new(setting_path);
-        let raw_path = (&setting.conf_path).to_string();
+        let raw_path = setting.get_conf_path().to_string();
         let config_path = Path::new(&raw_path);
 
         Self {
             setting,
-            meta: ClientMeta::new(),
+            meta: meta::Meta::new(),
             user: userinfo::UserInfo::new(config_path),
             subscription: subscription::Subscription::new(config_path),
             config_path: raw_path,
@@ -76,78 +74,37 @@ impl Client {
         self.subscription.print_start_msg();
         println!("---------");
     }
-}
-
-pub struct ClientMeta {
-    version: String,
-}
-impl Default for ClientMeta {
-    fn default() -> Self {
-        return Self::new();
+    #[allow(dead_code)]
+    fn open_game_page(&self) {
+        todo!();
+        //TODO: open webBrowser
     }
-}
-
-impl ClientMeta {
-    pub fn new() -> Self {
-        //TODO: check It work
-        return Self {
-            version: Self::load(),
-        };
-    }
-    fn get_version(&self) -> &str {
-        &self.version
-    }
-    fn load() -> String {
-        let path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-        let meta = MetadataCommand::new()
-            .manifest_path("./Cargo.toml")
-            .current_dir(&path)
-            .exec()
-            .unwrap();
-        let root = meta.root_package().unwrap();
-        let version = (&root.version).to_string();
-        return version;
-    }
-}
-
-pub fn start_msg() {
-    let client = match get_client() {
-        None => panic!(),
-        Some(a) => a,
-    };
-    println!("start as cli");
-    println!("---setting---");
-    println!("lisa - version : {}", client.borrow().meta.get_version());
-
-    println!("access as nexon : {}", client.borrow().setting.is_nexon);
-    println!("----feed infos----");
-    //TODO: print last update magazine, update, notify as date
-    // println!("magazine : {}", client.get_last_magazine());
-    println!("---------");
-}
-pub fn init() {
-    unsafe {
-        REQ_CLIENT = Some(Rc::new(RefCell::new(reqwest::Client::new())));
-        STATIC_CLIENT = Some(Rc::new(RefCell::new(Client::new())));
-        HISTORY = Some(Rc::new(RefCell::new(history::init())));
-    }
-}
-pub fn get_client() -> Option<RcClient> {
-    unsafe {
-        match &STATIC_CLIENT {
-            Some(rcs) => Some(Rc::clone(&rcs)),
-            None => None,
+    pub fn instance() -> RwLockCLient {
+        unsafe {
+            match &CLIENT {
+                None => {
+                    let client = Rc::new(RefCell::new(RwLock::new(Client::new())));
+                    let ref_client = Rc::clone(&client);
+                    CLIENT = Some(client);
+                    return ref_client;
+                }
+                Some(client) => Rc::clone(client),
+            }
         }
     }
-}
-pub fn get_req_client() -> Option<Rc<RefCell<reqwest::Client>>> {
-    unsafe {
-        match &REQ_CLIENT {
-            Some(req) => Some(Rc::clone(&req)),
-            None => None,
-        }
+    pub fn start_msg(&self) {
+        println!("start as cli");
+        println!("---setting---");
+        println!("lisa - version : {}", self.meta.get_version());
+
+        println!("access as nexon : {}", self.setting.is_nexon);
+        println!("----feed infos----");
+        //TODO: print last update magazine, update, notify as date
+        // println!("magazine : {}", client.get_last_magazine());
+        println!("---------");
     }
 }
+
 pub fn get_history() -> Option<Rc<RefCell<history::Histories>>> {
     unsafe {
         match &HISTORY {
@@ -157,21 +114,22 @@ pub fn get_history() -> Option<Rc<RefCell<history::Histories>>> {
     }
 }
 
-//TODO: remove dead_code notation
-/*
-#[allow(dead_code)]
-impl Client {
-    fn open_game_page(&self) {
-        //TODO: open webBrowser
+#[cfg(test)]
+mod test {
+
+    use super::*;
+    #[test]
+    fn generate_client() {
+        Client::new();
     }
-    fn get_payers(&mut self) -> &mut Vec<player::PlayerBase> {
-        &mut self.players
-    }
-    fn get_clans(&mut self) -> &mut Vec<clan::ClanBase> {
-        &mut self.clans
-    }
-    fn get_birth_day(&self) -> &Option<UtcTime> {
-        &self.birth_day
+
+    #[test]
+    fn rw_lock_client() {
+        let ins2: RwLockCLient = Client::instance();
+        let borrowed = ins2.borrow_mut();
+        let mut instance = borrowed.try_write().unwrap();
+        println!("version: {}", instance.meta.get_version());
+        (*instance).setting.neople_api_key = "test".to_string();
+        instance.subscription.save().expect("failed to save");
     }
 }
-*/
