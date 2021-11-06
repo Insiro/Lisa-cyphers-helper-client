@@ -11,7 +11,6 @@ pub fn start_cli(com: String) {
             return;
         }
         "--cli" => {
-            client::init();
             let mut cli = CliController::new();
             cli.start();
         }

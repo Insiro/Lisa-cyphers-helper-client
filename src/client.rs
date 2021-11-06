@@ -9,8 +9,9 @@ use std::{cell::RefCell, fs};
 mod meta;
 mod setting;
 mod subscription;
+#[cfg(test)]
+mod test;
 mod userinfo;
-
 type RwLockCLient = Rc<RefCell<RwLock<Client>>>;
 static mut HISTORY: Option<Rc<RefCell<history::Histories>>> = None;
 static mut CLIENT: Option<RwLockCLient> = None;
@@ -111,25 +112,5 @@ pub fn get_history() -> Option<Rc<RefCell<history::Histories>>> {
             None => None,
             Some(his) => Some(Rc::clone(&his)),
         }
-    }
-}
-
-#[cfg(test)]
-mod test {
-
-    use super::*;
-    #[test]
-    fn generate_client() {
-        Client::new();
-    }
-
-    #[test]
-    fn rw_lock_client() {
-        let ins2: RwLockCLient = Client::instance();
-        let borrowed = ins2.borrow_mut();
-        let mut instance = borrowed.try_write().unwrap();
-        println!("version: {}", instance.meta.get_version());
-        (*instance).setting.neople_api_key = "test".to_string();
-        instance.subscription.save().expect("failed to save");
     }
 }
