@@ -1,17 +1,27 @@
 #[allow(non_snake_case)]
 
 pub type Result<T> = std::result::Result<T, Error>;
-pub struct Error {
-    msg: String,
-    error: Kind,
-}
+use std::fmt::Display;
+#[derive(Debug)]
 pub enum Kind {
-    UserNotFoundError,
+    NotFoundError,
     NetworkError,
-    NotDefinedError,
+    NotDefined,
     DataError,
     FileLoadError,
     DataLoadError,
+}
+impl Kind {
+    pub fn to_str(&self) -> &str {
+        match self {
+            NotFoundError => "NotFoundError",
+            NetworkError => "NetworkError",
+            NotDefined => "NotDefined",
+            DataError => "DataError",
+            FileLoadError => "FileLoadError",
+            DataLoadError => "FileLoadError",
+        }
+    }
 }
 pub fn new(msg: &str, error: Kind) -> Error {
     Error {
@@ -19,6 +29,12 @@ pub fn new(msg: &str, error: Kind) -> Error {
         error,
     }
 }
+#[derive(Debug)]
+pub struct Error {
+    msg: String,
+    error: Kind,
+}
+
 impl Error {
     pub fn get_msg(&self) -> &str {
         &self.msg
@@ -27,3 +43,9 @@ impl Error {
         &self.error
     }
 }
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.error.to_str())
+    }
+}
+impl std::error::Error for Error {}

@@ -19,6 +19,33 @@ impl Kind {
         }
     }
 }
+
+pub mod new {
+    pub struct History {
+        key: Option<String>,
+        page: Box<dyn PageTrait>,
+    }
+    pub trait PageTrait {
+        fn to_str(&self) -> &str;
+        fn from_key(&mut self, key: &str);
+    }
+    pub struct Histories(Vec<Box<dyn PageTrait>>);
+    impl Histories {
+        pub fn new() -> Self {
+            Histories(vec![])
+        }
+        pub fn len(&self) -> usize {
+            self.0.len()
+        }
+        pub fn insert(&mut self, history: Box<dyn PageTrait>) {
+            self.0.push(history);
+        }
+        pub fn pop(&mut self) -> Option<Box<dyn PageTrait>> {
+            self.0.pop()
+        }
+    }
+}
+
 pub struct History {
     page: history::Kind,
     key: Option<String>,
