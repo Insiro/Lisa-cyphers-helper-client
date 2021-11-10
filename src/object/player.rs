@@ -10,22 +10,6 @@ pub enum Gender {
     Unknown,
 }
 
-pub fn get_user_id(name: &str) -> lisa_error::Result<String> {
-    let rlt = neople::players::Base::search(name);
-    match rlt {
-        Err(err) => Err(err),
-        Ok(value) => Ok(value.playerId.to_string()),
-    }
-}
-
-pub fn get_user_name(id: &str) -> Result<String, lisa_error::Error> {
-    let rlt = neople::players::Info::get(id);
-    match rlt {
-        Err(err) => Err(err),
-        Ok(value) => Ok(value.nickname().to_string()),
-    }
-}
-
 pub trait PlayerChangerble {
     fn set_nickname(&mut self, player_name: &str) -> bool;
     fn set_player_id(&mut self, id: &str) -> lisa_error::Result<()>;

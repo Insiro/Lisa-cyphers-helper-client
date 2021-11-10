@@ -1,66 +1,51 @@
-#![allow(dead_code, non_snake_case)]
+#![allow(non_snake_case)]
+use super::info;
 use crate::error as lisa_error;
 use crate::object;
 use crate::util::temp;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json;
-type UtcTime = Option<DateTime<Utc>>;
-use super::info;
-use getset::Getters;
 
-mod Matches;
+pub mod Base;
+pub mod Records;
 mod records;
 
-#[derive(Deserialize, Clone)]
-pub struct Base {
-    pub playerId: String,
-    pub nickname: String,
-    pub grade: u8,
+trait Player {
+    fn get_id(&self) -> &str;
+    fn get_name(&self) -> &str;
 }
 
-impl Base {
-    pub fn search(_nickName: &str) -> lisa_error::Result<Base> {
-        let p = temp::parse::player_id(_nickName);
-        let obj: serde_json::Result<PlayerBaseList> = serde_json::from_str(p.as_str());
-        match obj {
-            Err(_) => Err(lisa_error::new("failed parse", lisa_error::Kind::DataError)),
-            Ok(ok) => {
-                let row = ok.rows;
-                match row.is_empty() {
-                    true => Err(lisa_error::new(
-                        "Not Found",
-                        lisa_error::Kind::UserNotFoundError,
-                    )),
-                    false => Ok(row[0].clone()),
-                }
+trait PlayerBuilder: Sized {
+    fn new(id: String) -> Self;
+    fn build(&mut self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>>;
+}
+
+#[macro_export]
+macro_rules! player_impl {
+    ($type:ident) => {
+        impl Player for $type {
+            fn get_id(&self) -> &str {
+                &self.playerId
+            }
+            fn get_name(&self) -> &str {
+                &self.nickname
             }
         }
-    }
+    };
 }
 
-#[derive(Deserialize, Serialize, Getters)]
+#[derive(Deserialize, Serialize)]
 pub struct Info {
-    #[getset(get = "pub")]
     playerId: String,
-    #[getset(get = "pub")]
     nickname: String,
-    #[getset(get = "pub")]
     grade: u8,
-    #[getset(get = "pub")]
     clanName: String,
-    #[getset(get = "pub")]
     ratingPoint: Option<u8>,
-    #[getset(get = "pub")]
     maxRatingPoint: Option<u8>,
-    #[getset(get = "pub")]
     tierName: Option<String>,
-    #[getset(get = "pub")]
     records: Vec<records::Records>,
 }
-
-impl super::Neople for Base {}
-impl super::Neople for Info {}
+player_impl!(Info);
 
 impl Info {
     pub fn get(id: &str) -> lisa_error::Result<Info> {
@@ -104,9 +89,4 @@ impl object::Objects for Info {
             }
         }
     }
-}
-
-#[derive(Deserialize)]
-struct PlayerBaseList {
-    pub rows: Vec<Base>,
 }
