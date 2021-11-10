@@ -62,7 +62,7 @@ impl PlayerBuilder for RecordBuilder {
             limit: 100,
         }
     }
-    fn build(&mut self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
+    fn build(&self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
         let parsed = temp::parse::player_history(
             &self.id,
             self.isNormal,

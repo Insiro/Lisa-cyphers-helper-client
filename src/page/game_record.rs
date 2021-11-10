@@ -7,18 +7,18 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct GameRecord {
-    player: Info,
+    player: Info::Info,
     records: Vec<GameInfo>,
 }
 impl GameRecord {
-    pub fn get_player(&mut self) -> &Info {
+    pub fn get_player(&mut self) -> &Info::Info {
         &self.player
     }
     pub fn get_records(&mut self) -> &Vec<GameInfo> {
         &self.records
     }
     pub fn cli(&mut self) {
-        let player_name = self.player.nickname();
+        let player_name = self.player.get_name();
         let mut mat_str = String::new();
         let mut i = 0;
         for mat in self.records.iter() {

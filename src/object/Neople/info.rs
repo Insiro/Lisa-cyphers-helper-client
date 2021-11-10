@@ -138,7 +138,7 @@ impl Character {
         }
     }
 }
-impl super::Neople for Character {}
+// impl super::Neople for Character {}
 
 mod sub {
     use super::*;

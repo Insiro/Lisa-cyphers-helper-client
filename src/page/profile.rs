@@ -11,7 +11,7 @@ pub fn gui() {}
 
 #[derive(Serialize, Deserialize)]
 pub struct Profile {
-    player: Info,
+    player: Info::Info,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
@@ -22,7 +22,7 @@ pub struct Profile {
 
 pub fn dumy() -> Profile {
     Profile {
-        player: Info::dumy(),
+        player: Info::Info::dumy(),
         memo: None,
         gender: Gender::Unknown,
         name: None,
@@ -31,7 +31,7 @@ pub fn dumy() -> Profile {
     }
 }
 pub fn new(
-    player: Info,
+    player: Info::Info,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
@@ -49,7 +49,7 @@ pub fn new(
 }
 
 impl Profile {
-    pub fn get_player(&self) -> &Info {
+    pub fn get_player(&self) -> &Info::Info {
         &self.player
     }
     pub fn get_positions(&self) -> &charactor::CharList {

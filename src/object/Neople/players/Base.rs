@@ -36,14 +36,14 @@ impl Base {
 player_impl!(Base);
 
 struct BaseBuilder {
-    id:String
+    id: String,
 }
 
-impl PlayerBuilder for BaseBuilder{
-    fn new(id:String)->Self{
-        Self{id}
+impl PlayerBuilder for BaseBuilder {
+    fn new(id: String) -> Self {
+        Self { id }
     }
-    fn build(&mut self)->Result<Box<dyn Player>, Box<dyn std::error::Error>>{
+    fn build(&self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
         todo!();
     }
 }
