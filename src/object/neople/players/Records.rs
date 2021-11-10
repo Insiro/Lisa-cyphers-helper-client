@@ -1,6 +1,7 @@
 #![allow(dead_code, non_snake_case)]
+use super::super::Record;
+use super::Player;
 use super::{info, PlayerBuilder};
-use super::{records, Player};
 use crate::error as lisa_error;
 use crate::player_impl;
 use crate::util::{temp, UtcTime};
@@ -16,7 +17,7 @@ pub struct Records {
     ratingPoint: Option<u8>,
     maxRatingPoint: Option<u8>,
     tierName: Option<String>,
-    records: Vec<records::Records>,
+    records: Vec<Record::Record>,
     matches: MatchBase,
 }
 impl Records {}

@@ -1,14 +1,13 @@
 #![allow(non_snake_case)]
 use super::info;
+use super::Record;
 use crate::error as lisa_error;
 use crate::object;
 use crate::util::temp;
 use serde::{Deserialize, Serialize};
 use serde_json;
-
 pub mod Base;
 pub mod Records;
-mod records;
 
 trait Player {
     fn get_id(&self) -> &str;
@@ -43,7 +42,7 @@ pub struct Info {
     ratingPoint: Option<u8>,
     maxRatingPoint: Option<u8>,
     tierName: Option<String>,
-    records: Vec<records::Records>,
+    records: Vec<Record::Record>,
 }
 player_impl!(Info);
 
@@ -74,7 +73,7 @@ impl Info {
             ratingPoint: None,
             maxRatingPoint: None,
             tierName: None,
-            records: vec![records::dumy()],
+            records: vec![Record::Record::dumy()],
         }
     }
 }

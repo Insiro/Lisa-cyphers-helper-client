@@ -1,3 +1,4 @@
+pub mod Record;
 pub mod info;
 pub mod matches;
 pub mod players;
