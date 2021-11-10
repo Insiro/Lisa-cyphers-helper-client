@@ -19,22 +19,7 @@ pub struct Base {
     grade: u8,
 }
 
-impl Base {
-    pub fn from_name(_nickName: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let p = temp::parse::player_id(_nickName);
-        let obj: PlayerBaseList = serde_json::from_str(p.as_str())?;
-        let row = obj.rows;
-        if row.is_empty() {
-            return Err(Box::new(lisa_error::new(
-                "Not Found",
-                lisa_error::Kind::NotFoundError,
-            )));
-        }
-        Ok(row[0].clone())
-    }
-}
 player_impl!(Base);
-
 struct BaseBuilder {
     id: String,
 }
@@ -43,7 +28,29 @@ impl PlayerBuilder for BaseBuilder {
     fn new(id: String) -> Self {
         Self { id }
     }
+
     fn build(&self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
-        todo!();
+        let p = temp::parse::player(&self.id);
+        let obj: PlayerBaseList = serde_json::from_str(p.as_str())?;
+
+        let player = Self::get_player(obj)?;
+        Ok(Box::new(player))
+    }
+}
+impl BaseBuilder {
+    fn from_name(name: &str) -> Result<Base, Box<dyn std::error::Error>> {
+        let p = temp::parse::player(&name);
+        let obj: PlayerBaseList = serde_json::from_str(p.as_str())?;
+        Self::get_player(obj)
+    }
+    fn get_player(players: PlayerBaseList) -> Result<Base, Box<dyn std::error::Error>> {
+        let row = players.rows;
+        if row.is_empty() {
+            return Err(Box::new(lisa_error::new(
+                "Not Found",
+                lisa_error::Kind::NotFoundError,
+            )));
+        }
+        Ok(row[0])
     }
 }

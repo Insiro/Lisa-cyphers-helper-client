@@ -64,7 +64,7 @@ impl GameRecord {
 }
 pub fn dumy() -> GameRecord {
     GameRecord {
-        player: Info::dumy(),
+        player: Info::Info::dumy(),
         records: vec![],
     }
 }

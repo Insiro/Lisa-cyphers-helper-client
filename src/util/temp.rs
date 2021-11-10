@@ -25,7 +25,7 @@ pub mod parse {
         "".to_string()
     }
 
-    pub fn player_id(_name: &str) -> String {
+    pub fn player(_id: &str) -> String {
         read_string("player")
     }
     pub fn player_info(_id: &str) -> String {

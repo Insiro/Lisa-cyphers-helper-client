@@ -1,7 +1,7 @@
+use super::Neople;
 use crate::error as lisa_error;
-use super::neople;
-pub use neople::players::Info;
 use serde::{Deserialize, Serialize};
+pub use Neople::players::Info;
 
 #[derive(Serialize, Deserialize)]
 pub enum Gender {

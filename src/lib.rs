@@ -3,7 +3,8 @@ pub mod servicer;
 pub mod object {
     pub mod charactor;
     pub mod clan;
-    pub mod neople;
+    pub mod Neople;
+    pub mod saved;
     pub mod notify;
     pub mod player;
     pub trait Objects {

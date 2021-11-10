@@ -1,6 +1,5 @@
 use super::{Player, PlayerBuilder};
 use crate::error as lisa_error;
-use crate::object;
 use crate::object::Neople::Record;
 use crate::player_impl;
 use crate::util::temp;
