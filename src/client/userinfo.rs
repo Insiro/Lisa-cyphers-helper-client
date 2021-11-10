@@ -1,25 +1,22 @@
 use crate::object::charactor::CharList;
 use crate::object::clan;
 use crate::object::player;
-use crate::util::data_serializer::date_se;
-use crate::util::temp;
-use chrono::{DateTime, Utc};
+use crate::util::data_serializer::option_date_se;
+use crate::util::{temp, UtcTime};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-
-type UtcTime = DateTime<Utc>;
 
 use super::{ClientSave, Save};
 
 #[derive(Serialize, Deserialize)]
 pub struct UserInfo {
     players: Vec<player::PlayerBase>,
-    #[serde(with = "date_se")]
+    #[serde(with = "option_date_se")]
     birth_day: Option<UtcTime>,
     clans: Vec<clan::ClanBase>,
     charactors: CharList,
-    self_path:String
+    self_path: String,
 }
 impl Save for UserInfo {
     fn new(path: &Path) -> Self {
@@ -51,7 +48,7 @@ impl ClientSave for UserInfo {
             birth_day: None,
             clans: Vec::new(),
             charactors: Vec::new(),
-            self_path:Self::get_default_path()
+            self_path: Self::get_default_path(),
         }
     }
 

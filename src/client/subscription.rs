@@ -1,21 +1,20 @@
 use super::{ClientSave, Save};
-use crate::util::{data_serializer::date_se, temp};
-use chrono::{DateTime, Utc};
+use crate::util::{data_serializer::option_date_se, temp, UtcTime};
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fs;
 use std::path::Path;
 
-type UtcTime = DateTime<Utc>;
 #[derive(Serialize, Deserialize)]
 pub struct Subscription {
-    #[serde(with = "date_se")]
+    #[serde(with = "option_date_se")]
     last_notify: Option<UtcTime>,
-    #[serde(with = "date_se")]
+    #[serde(with = "option_date_se")]
     last_magazine: Option<UtcTime>,
-    #[serde(with = "date_se")]
+    #[serde(with = "option_date_se")]
     last_update: Option<UtcTime>,
-    self_path:String
+    self_path: String,
 }
 impl Save for Subscription {
     fn new(path: &Path) -> Self {
@@ -46,7 +45,7 @@ impl ClientSave for Subscription {
             last_notify: Some(Utc::now()),
             last_magazine: Some(Utc::now()),
             last_update: Some(Utc::now()),
-            self_path:Self::get_default_path()
+            self_path: Self::get_default_path(),
         }
     }
 

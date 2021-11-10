@@ -1,14 +1,11 @@
-use chrono::{DateTime, Utc};
+use crate::object::{charactor, player};
+use crate::util::data_serializer::option_date_se;
+use crate::util::UtcTime;
+use player::{Gender, Info};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fs;
 use std::path::Path;
-
-use crate::object::{charactor, player};
-use crate::util::data_serializer::date_se;
-use player::{Gender, Info};
-
-type UtcTime = Option<DateTime<Utc>>;
 
 pub fn gui() {}
 
@@ -19,8 +16,8 @@ pub struct Profile {
     gender: Gender,
     name: Option<String>,
     position: charactor::CharList,
-    #[serde(with = "date_se")]
-    birth_day: UtcTime,
+    #[serde(with = "option_date_se")]
+    birth_day: Option<UtcTime>,
 }
 
 pub fn dumy() -> Profile {
@@ -39,7 +36,7 @@ pub fn new(
     gender: Gender,
     name: Option<String>,
     position: charactor::CharList,
-    birth_day: UtcTime,
+    birth_day: Option<UtcTime>,
 ) -> Profile {
     Profile {
         player,

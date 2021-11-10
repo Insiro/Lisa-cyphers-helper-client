@@ -1,7 +1,6 @@
 #![allow(dead_code, non_snake_case)]
 
-use chrono::{DateTime, Utc};
-type UtcTime = Option<DateTime<Utc>>;
+use super::UtcTime;
 
 //TODO: make all functions exactly
 
@@ -35,8 +34,8 @@ pub mod parse {
     pub fn player_history(
         _id: &str,
         _isNormal: bool,
-        _startDate: UtcTime,
-        _endDate: UtcTime,
+        _startDate: &Option<UtcTime>,
+        _endDate: &Option<UtcTime>,
         _limit: u8,
     ) -> String {
         read_string("playerHistory")
