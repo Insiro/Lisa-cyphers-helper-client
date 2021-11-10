@@ -1,4 +1,4 @@
-use crate::{client, command::Command};
+use crate::command::Command;
 use std::{io, process};
 pub trait CliTrait {
     fn cli_runner(&mut self) -> Command;

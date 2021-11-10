@@ -1,7 +1,6 @@
-use crate::util::data_serializer::date_se;
-use chrono::{DateTime, Utc};
+use crate::util::data_serializer::option_date_se;
+use crate::util::UtcTime;
 use serde::{Deserialize, Serialize};
-type UtcTime = DateTime<Utc>;
 
 #[derive(Serialize, Deserialize)]
 enum Kind {
@@ -18,7 +17,7 @@ pub struct Notify {
     kind: Kind,
     link: Option<String>,
     title: Option<String>,
-    #[serde(with = "date_se")]
+    #[serde(with = "option_date_se")]
     date: Option<UtcTime>,
 }
 
@@ -33,7 +32,7 @@ impl Notify {
             date: None,
         }
     }
-    
+
     fn parse_app(_url: &str) -> Vec<Notify> {
         vec![Notify::dumy()]
     }
