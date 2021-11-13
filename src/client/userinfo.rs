@@ -11,7 +11,7 @@ use super::{ClientSave, Save};
 
 #[derive(Serialize, Deserialize)]
 pub struct UserInfo {
-    players: Vec<player::base::Base>,
+    players: Vec<player::Base>,
     #[serde(with = "option_date_se")]
     birth_day: Option<UtcTime>,
     clans: Vec<clan::ClanBase>,

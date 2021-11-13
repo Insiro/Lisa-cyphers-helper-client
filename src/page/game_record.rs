@@ -7,11 +7,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct GameRecord {
-    player: player::info::Info,
+    player: player::Info,
     records: Vec<GameInfo>,
 }
 impl GameRecord {
-    pub fn get_player(&mut self) -> &player::info::Info {
+    pub fn get_player(&mut self) -> &player::Info {
         &self.player
     }
     pub fn get_records(&mut self) -> &Vec<GameInfo> {
@@ -64,7 +64,7 @@ impl GameRecord {
 }
 pub fn dumy() -> GameRecord {
     GameRecord {
-        player: player::info::Info::dumy(),
+        player: player::Info::dumy(),
         records: vec![],
     }
 }

@@ -47,7 +47,7 @@ pub struct MatchDate {
 
 player_impl_neople!(Records);
 
-struct RecordBuilder {
+pub struct RecordBuilder {
     id: String,
     isNormal: bool,
     startDate: Option<UtcTime>, //api 기본값 : 현재시간

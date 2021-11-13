@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use super::Player;
 use super::PlayerBuilder;
 use crate::error as lisa_error;
@@ -22,11 +23,22 @@ impl Object for Base {}
 
 player_impl_neople!(Base);
 
-pub struct Builder {
+impl Base {
+    pub fn from_player(player: &Box<dyn Player>) -> Self {
+        let p = player.as_ref();
+        Self {
+            nickname: p.get_name().to_string(),
+            playerId: p.get_id().to_string(),
+            grade: p.get_grade(),
+        }
+    }
+}
+
+pub struct BaseBuilder {
     id: String,
 }
 
-impl PlayerBuilder for Builder {
+impl PlayerBuilder for BaseBuilder {
     type Player = Base;
     fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
         Ok(Self { id })
@@ -40,8 +52,8 @@ impl PlayerBuilder for Builder {
         Ok(player)
     }
 }
-impl Builder {
-    fn from_name(name: &str) -> Result<Base, Box<dyn std::error::Error>> {
+impl BaseBuilder {
+    pub fn from_name(name: &str) -> Result<Base, Box<dyn std::error::Error>> {
         let p = temp::parse::player(&name);
         let obj: PlayerBaseList = serde_json::from_str(p.as_str())?;
         Self::get_player(obj)

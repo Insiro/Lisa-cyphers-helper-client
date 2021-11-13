@@ -7,11 +7,24 @@ pub enum Gender {
     Unknown,
 }
 
-pub mod Records;
-pub mod Saved;
-pub mod base;
-pub mod info;
+//#region redefine module and NameSpace
+mod base;
+mod info;
+mod record;
+mod saved;
 
+pub use base::Base;
+pub use info::Info;
+pub use record::Records;
+pub use saved::Saved;
+
+pub mod builder {
+    pub use super::base::BaseBuilder;
+    pub use super::info::InfoBuilder;
+    pub use super::record::RecordBuilder;
+    pub use super::saved::SavedBuilder;
+}
+//#endregion
 pub trait Player: super::Object {
     fn get_id(&self) -> &str;
     fn get_name(&self) -> &str;

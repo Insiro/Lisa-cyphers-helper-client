@@ -14,12 +14,12 @@ pub enum Kind {
 impl Kind {
     pub fn to_str(&self) -> &str {
         match self {
-            NotFoundError => "NotFoundError",
-            NetworkError => "NetworkError",
-            NotDefined => "NotDefined",
-            DataError => "DataError",
-            FileLoadError => "FileLoadError",
-            DataLoadError => "FileLoadError",
+            Kind::NotFoundError => "NotFoundError",
+            Kind::NetworkError => "NetworkError",
+            Kind::NotDefined => "NotDefined",
+            Kind::DataError => "DataError",
+            Kind::FileLoadError => "FileLoadError",
+            Kind::DataLoadError => "FileLoadError",
         }
     }
 }

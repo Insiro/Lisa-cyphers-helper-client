@@ -1,7 +1,7 @@
 use crate::object::{charactor, player};
 use crate::util::data_serializer::option_date_se;
 use crate::util::UtcTime;
-use player::{Gender, info};
+use player::Gender;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::fs;
@@ -11,7 +11,7 @@ pub fn gui() {}
 
 #[derive(Serialize, Deserialize)]
 pub struct Profile {
-    player: info::Info,
+    player: player::Info,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
@@ -22,7 +22,7 @@ pub struct Profile {
 
 pub fn dumy() -> Profile {
     Profile {
-        player: info::Info::dumy(),
+        player: player::Info::dumy(),
         memo: None,
         gender: Gender::Unknown,
         name: None,
@@ -31,7 +31,7 @@ pub fn dumy() -> Profile {
     }
 }
 pub fn new(
-    player: info::Info,
+    player: player::Info,
     memo: Option<String>,
     gender: Gender,
     name: Option<String>,
@@ -49,7 +49,7 @@ pub fn new(
 }
 
 impl Profile {
-    pub fn get_player(&self) -> &info::Info {
+    pub fn get_player(&self) -> &player::Info {
         &self.player
     }
     pub fn get_positions(&self) -> &charactor::CharList {

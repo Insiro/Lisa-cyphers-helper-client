@@ -30,7 +30,7 @@ impl Command {
             Command::Back => "Back",
             Command::Some => "Some",
             Command::NotImpletated => "NotImplied",
-            Command::Err | _ => "Err",
+            Command::Err => "Err",
         }
     }
     pub fn help(&self, args: Vec<String>) {

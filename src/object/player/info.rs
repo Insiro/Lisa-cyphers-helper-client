@@ -1,12 +1,13 @@
+#![allow(non_snake_case)]
 use super::{Player, PlayerBuilder};
-use crate::object::{neople, Object};
-
 use crate::error as lisa_error;
 use crate::object::record;
+use crate::object::{neople, Object};
 use crate::player_impl_neople;
 use crate::util::temp;
 use serde::{Deserialize, Serialize};
 use serde_json;
+
 #[derive(Deserialize, Serialize)]
 pub struct Info {
     playerId: String,
@@ -36,10 +37,10 @@ impl Info {
     }
 }
 
-struct Builder {
+pub struct InfoBuilder {
     id: String,
 }
-impl PlayerBuilder for Builder {
+impl PlayerBuilder for InfoBuilder {
     type Player = Info;
     fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
         Ok(Self { id })

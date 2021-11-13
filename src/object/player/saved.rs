@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use super::{base, Gender};
 use super::{Player, PlayerBuilder};
 use crate::object::Object;
@@ -59,14 +60,14 @@ impl Saved {
 //     fn get_name(&self) -> &Option<String>;
 // }
 
-struct Builder {
+pub struct SavedBuilder {
     info: base::Base,
 }
 
-impl PlayerBuilder for Builder {
+impl PlayerBuilder for SavedBuilder {
     type Player = Saved;
     fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
-        let builder = base::Builder::new(id)?;
+        let builder = base::BaseBuilder::new(id)?;
         let info = builder.build()?;
         Ok(Self { info })
     }
@@ -76,17 +77,13 @@ impl PlayerBuilder for Builder {
     }
 }
 
-impl Builder {
-    fn from_player(player: &Box<dyn Player>) -> Self {
+impl SavedBuilder {
+    pub fn from_player(player: &Box<dyn Player>) -> Self {
         let p = player.as_ref();
-        let base = base::Base {
-            nickname: p.get_name().to_string(),
-            playerId: p.get_id().to_string(),
-            grade: p.get_grade(),
-        };
+        let base = base::Base::from_player(player);
         Self::from_base(base)
     }
-    fn from_base(player_base: base::Base) -> Self {
+    pub fn from_base(player_base: base::Base) -> Self {
         Self { info: player_base }
     }
 }
