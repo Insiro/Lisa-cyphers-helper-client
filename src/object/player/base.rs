@@ -1,11 +1,10 @@
-use serde::{Deserialize, Serialize};
-
-use crate::error as lisa_error;
-use crate::player_impl;
-use crate::util::temp;
-
 use super::Player;
 use super::PlayerBuilder;
+use crate::error as lisa_error;
+use crate::object::{neople, Object};
+use crate::player_impl_neople;
+use crate::util::temp;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 struct PlayerBaseList {
@@ -16,28 +15,32 @@ struct PlayerBaseList {
 pub struct Base {
     playerId: String,
     nickname: String,
-    grade: u8,
+    pub grade: u8,
 }
+impl neople::Object for Base {}
+impl Object for Base {}
 
-player_impl!(Base);
-struct BaseBuilder {
+player_impl_neople!(Base);
+
+pub struct Builder {
     id: String,
 }
 
-impl PlayerBuilder for BaseBuilder {
-    fn new(id: String) -> Self {
-        Self { id }
+impl PlayerBuilder for Builder {
+    type Player = Base;
+    fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
+        Ok(Self { id })
     }
 
-    fn build(&self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
+    fn build(&self) -> Result<Self::Player, Box<dyn std::error::Error>> {
         let p = temp::parse::player(&self.id);
         let obj: PlayerBaseList = serde_json::from_str(p.as_str())?;
 
         let player = Self::get_player(obj)?;
-        Ok(Box::new(player))
+        Ok(player)
     }
 }
-impl BaseBuilder {
+impl Builder {
     fn from_name(name: &str) -> Result<Base, Box<dyn std::error::Error>> {
         let p = temp::parse::player(&name);
         let obj: PlayerBaseList = serde_json::from_str(p.as_str())?;
@@ -51,6 +54,6 @@ impl BaseBuilder {
                 lisa_error::Kind::NotFoundError,
             )));
         }
-        Ok(row[0])
+        Ok(row[0].clone())
     }
 }

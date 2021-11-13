@@ -1,24 +1,24 @@
 use std::io;
 
 // use crate::object::charactor::Charactor;
-use crate::object::player::Info;
+use crate::object::player;
 use crate::page::matches;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct GameRecord {
-    player: Info::Info,
+    player: player::info::Info,
     records: Vec<GameInfo>,
 }
 impl GameRecord {
-    pub fn get_player(&mut self) -> &Info::Info {
+    pub fn get_player(&mut self) -> &player::info::Info {
         &self.player
     }
     pub fn get_records(&mut self) -> &Vec<GameInfo> {
         &self.records
     }
     pub fn cli(&mut self) {
-        let player_name = self.player.get_name();
+        let player_name = player::Player::get_name(&self.player);
         let mut mat_str = String::new();
         let mut i = 0;
         for mat in self.records.iter() {
@@ -64,7 +64,7 @@ impl GameRecord {
 }
 pub fn dumy() -> GameRecord {
     GameRecord {
-        player: Info::Info::dumy(),
+        player: player::info::Info::dumy(),
         records: vec![],
     }
 }

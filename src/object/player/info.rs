@@ -1,7 +1,9 @@
 use super::{Player, PlayerBuilder};
+use crate::object::{neople, Object};
+
 use crate::error as lisa_error;
-use crate::object::Neople::Record;
-use crate::player_impl;
+use crate::object::record;
+use crate::player_impl_neople;
 use crate::util::temp;
 use serde::{Deserialize, Serialize};
 use serde_json;
@@ -9,15 +11,16 @@ use serde_json;
 pub struct Info {
     playerId: String,
     nickname: String,
-    grade: u8,
+    pub grade: u8,
     clanName: String,
     ratingPoint: Option<u8>,
     maxRatingPoint: Option<u8>,
     tierName: Option<String>,
-    records: Vec<Record::Record>,
+    records: Vec<record::Record>,
 }
-player_impl!(Info);
-
+impl neople::Object for Info {}
+impl Object for Info {}
+player_impl_neople!(Info);
 impl Info {
     pub fn dumy() -> Info {
         Info {
@@ -28,7 +31,7 @@ impl Info {
             ratingPoint: None,
             maxRatingPoint: None,
             tierName: None,
-            records: vec![Record::Record::dumy()],
+            records: vec![record::Record::dumy()],
         }
     }
 }
@@ -37,11 +40,12 @@ struct Builder {
     id: String,
 }
 impl PlayerBuilder for Builder {
-    fn new(id: String) -> Self {
-        todo!()
+    type Player = Info;
+    fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
+        Ok(Self { id })
     }
 
-    fn build(&self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
+    fn build(&self) -> Result<Info, Box<dyn std::error::Error>> {
         let parsed = temp::parse::player_info(&self.id);
         let se: serde_json::Result<Info> = serde_json::from_str(&parsed);
         match se {
@@ -49,7 +53,7 @@ impl PlayerBuilder for Builder {
                 "parse failed",
                 lisa_error::Kind::DataError,
             ))),
-            Ok(ok) => Ok(Box::new(ok)),
+            Ok(ok) => Ok(ok),
         }
     }
 }

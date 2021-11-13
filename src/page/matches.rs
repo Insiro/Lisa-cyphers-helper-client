@@ -1,6 +1,6 @@
-use crate::object::{charactor::Charactor, player::Info};
+use crate::object::{charactor::Charactor, player::info};
 pub struct PlayerInfo {
-    player: Info::Info,
+    player: info::Info,
     kill: u8,
     death: u8,
     assist: u8,
@@ -14,7 +14,7 @@ pub struct PlayerInfo {
 impl PlayerInfo {
     pub fn dumy() -> PlayerInfo {
         PlayerInfo {
-            player: Info::Info::dumy(),
+            player: info::Info::dumy(),
             attack_point: 0,
             kill: 0,
             death: 0,

@@ -1,9 +1,10 @@
-#![allow(dead_code, non_snake_case)]
-use super::super::Record;
-use super::Player;
-use super::{info, PlayerBuilder};
+#![allow(non_snake_case)]
+use super::super::info;
+use super::super::record;
+use super::{Player, PlayerBuilder};
 use crate::error as lisa_error;
-use crate::player_impl;
+use crate::object::{neople, Object};
+use crate::player_impl_neople;
 use crate::util::{temp, UtcTime};
 use serde::Deserialize;
 use serde_json;
@@ -12,14 +13,16 @@ use serde_json;
 pub struct Records {
     playerId: String,
     nickname: String,
-    grade: u8,
+    pub grade: u8,
     clanName: String,
-    ratingPoint: Option<u8>,
-    maxRatingPoint: Option<u8>,
+    pub ratingPoint: Option<u8>,
+    pub maxRatingPoint: Option<u8>,
     tierName: Option<String>,
-    records: Vec<Record::Record>,
+    records: Vec<record::Record>,
     matches: MatchBase,
 }
+impl neople::Object for Records {}
+impl Object for Records {}
 impl Records {}
 
 #[derive(Deserialize)]
@@ -42,27 +45,28 @@ pub struct MatchDate {
     end: String,
 }
 
-player_impl!(Records);
+player_impl_neople!(Records);
 
 struct RecordBuilder {
     id: String,
     isNormal: bool,
-    startDate: Option<UtcTime>, //현재시간
-    endDate: Option<UtcTime>,   //30분 전
+    startDate: Option<UtcTime>, //api 기본값 : 현재시간
+    endDate: Option<UtcTime>,   //api 기본값 : 30일 전
     limit: u8,
 }
 
 impl PlayerBuilder for RecordBuilder {
-    fn new(id: String) -> Self {
-        Self {
+    type Player = Records;
+    fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
+        Ok(Self {
             id,
             isNormal: false,
             startDate: None,
             endDate: None,
             limit: 100,
-        }
+        })
     }
-    fn build(&self) -> Result<Box<dyn Player>, Box<dyn std::error::Error>> {
+    fn build(&self) -> Result<Self::Player, Box<dyn std::error::Error>> {
         let parsed = temp::parse::player_history(
             &self.id,
             self.isNormal,
@@ -76,7 +80,7 @@ impl PlayerBuilder for RecordBuilder {
                 "parse failed",
                 lisa_error::Kind::DataError,
             ))),
-            Ok(ok) => Ok(Box::new(ok)),
+            Ok(ok) => Ok(ok),
         }
     }
 }

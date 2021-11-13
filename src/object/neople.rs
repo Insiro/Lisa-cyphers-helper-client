@@ -1,6 +1,7 @@
 pub mod Record;
 pub mod info;
 pub mod matches;
-pub mod players;
 pub mod ranking;
-trait Neople {}
+
+pub trait Object: super::Object {}
+pub trait Builder{}

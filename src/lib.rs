@@ -1,16 +1,6 @@
 pub mod client;
 pub mod servicer;
-pub mod object {
-    pub mod charactor;
-    pub mod clan;
-    pub mod Neople;
-    pub mod saved;
-    pub mod notify;
-    pub mod player;
-    pub trait Objects {
-        fn refrash(&mut self) -> super::error::Result<()>;
-    }
-}
+pub mod object;
 pub mod cli;
 pub mod command;
 pub mod error;

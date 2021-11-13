@@ -1,7 +1,4 @@
-use super::Neople;
-use crate::error as lisa_error;
 use serde::{Deserialize, Serialize};
-pub use Neople::players::Info;
 
 #[derive(Serialize, Deserialize)]
 pub enum Gender {
@@ -10,19 +7,36 @@ pub enum Gender {
     Unknown,
 }
 
-pub trait PlayerChangerble {
-    fn set_nickname(&mut self, player_name: &str) -> bool;
-    fn set_player_id(&mut self, id: &str) -> lisa_error::Result<()>;
-}
-#[derive(Serialize, Deserialize)]
-pub struct PlayerBase {
-    player_name: String,
-    player_id: Option<String>,
+pub mod Records;
+pub mod Saved;
+pub mod base;
+pub mod info;
+
+pub trait Player: super::Object {
+    fn get_id(&self) -> &str;
+    fn get_name(&self) -> &str;
+    fn get_grade(&self) -> u8;
 }
 
-#[derive(Serialize, Deserialize)]
-struct ParseBase {
-    player_id: String,
-    nickname: String,
-    grade: u8,
+trait PlayerBuilder: Sized {
+    type Player;
+    fn new(id: String) -> Result<Self, Box<dyn std::error::Error>>;
+    fn build(&self) -> Result<Self::Player, Box<dyn std::error::Error>>;
+}
+
+#[macro_export]
+macro_rules! player_impl_neople {
+    ($type:ident) => {
+        impl Player for $type {
+            fn get_id(&self) -> &str {
+                &self.playerId
+            }
+            fn get_name(&self) -> &str {
+                &self.nickname
+            }
+            fn get_grade(&self) -> u8 {
+                self.grade
+            }
+        }
+    };
 }
