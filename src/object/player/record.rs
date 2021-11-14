@@ -85,13 +85,13 @@ impl PlayerBuilder for RecordBuilder {
     }
 }
 impl RecordBuilder {
-    fn set_rating_mode(&mut self, is_rating_mod: bool) {
+    pub fn set_rating_mode(&mut self, is_rating_mod: bool) {
         self.isNormal = is_rating_mod;
     }
-    fn set_limit(&mut self, limit: u8) {
+    pub fn set_limit(&mut self, limit: u8) {
         self.limit = limit;
     }
-    fn set_duration(&mut self, start: UtcTime, end: UtcTime) {
+    pub fn set_duration(&mut self, start: UtcTime, end: UtcTime) {
         self.startDate = Some(start);
         self.endDate = Some(end);
     }
