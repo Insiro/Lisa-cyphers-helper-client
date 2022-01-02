@@ -10,6 +10,7 @@ pub enum Kind {
     DataError,
     FileLoadError,
     DataLoadError,
+    BuilderError,
 }
 impl Kind {
     pub fn to_str(&self) -> &str {
@@ -20,6 +21,7 @@ impl Kind {
             Kind::DataError => "DataError",
             Kind::FileLoadError => "FileLoadError",
             Kind::DataLoadError => "FileLoadError",
+            Kind::BuilderError => "BuilderError",
         }
     }
 }
