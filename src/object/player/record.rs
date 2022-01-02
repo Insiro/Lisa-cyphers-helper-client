@@ -1,9 +1,7 @@
 #![allow(non_snake_case)]
-use super::super::info;
-use super::super::record;
 use super::{Player, PlayerBuilder};
 use crate::error as lisa_error;
-use crate::object::{neople, Object};
+use crate::object::{builder, info, neople, record, Object};
 use crate::player_impl_neople;
 use crate::util::{temp, UtcTime};
 use serde::Deserialize;
@@ -48,40 +46,51 @@ pub struct MatchDate {
 player_impl_neople!(Records);
 
 pub struct RecordBuilder {
-    id: String,
+    id: Option<String>,
     isNormal: bool,
     startDate: Option<UtcTime>, //api 기본값 : 현재시간
     endDate: Option<UtcTime>,   //api 기본값 : 30일 전
     limit: u8,
 }
-
-impl PlayerBuilder for RecordBuilder {
-    type Player = Records;
-    fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
-        Ok(Self {
-            id,
+impl builder::Builder for RecordBuilder {
+    type Target = Records;
+    fn new() -> Self {
+        Self {
+            id: None,
             isNormal: false,
             startDate: None,
             endDate: None,
             limit: 100,
-        })
-    }
-    fn build(&self) -> Result<Self::Player, Box<dyn std::error::Error>> {
-        let parsed = temp::parse::player_history(
-            &self.id,
-            self.isNormal,
-            &self.startDate,
-            &self.endDate,
-            self.limit,
-        );
-        let se: serde_json::Result<Records> = serde_json::from_str(&parsed);
-        match se {
-            Err(_) => Err(Box::new(lisa_error::new(
-                "parse failed",
-                lisa_error::Kind::DataError,
-            ))),
-            Ok(ok) => Ok(ok),
         }
+    }
+    fn build(&mut self) -> Result<Self::Target, Box<dyn std::error::Error>> {
+        match &self.id {
+            Some(id) => {
+                let parsed = temp::parse::player_history(
+                    &id,
+                    self.isNormal,
+                    &self.startDate,
+                    &self.endDate,
+                    self.limit,
+                );
+                let se: serde_json::Result<Records> = serde_json::from_str(&parsed);
+                match se {
+                    Err(_) => Err(Box::new(lisa_error::new(
+                        "parse failed",
+                        lisa_error::Kind::DataError,
+                    ))),
+                    Ok(ok) => Ok(ok),
+                }
+            }
+            None => Err(Box::new(builder::Error::new(
+                "ID not Initialized".to_string(),
+            ))),
+        }
+    }
+}
+impl PlayerBuilder for RecordBuilder {
+    fn set_id(&mut self, id: &str) {
+        self.id = Some(id.to_string());
     }
 }
 impl RecordBuilder {

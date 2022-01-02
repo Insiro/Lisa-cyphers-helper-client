@@ -1,8 +1,7 @@
 #![allow(non_snake_case)]
 use super::{Player, PlayerBuilder};
-use crate::error as lisa_error;
 use crate::object::record;
-use crate::object::{neople, Object};
+use crate::object::{builder, neople, Object};
 use crate::player_impl_neople;
 use crate::util::temp;
 use serde::{Deserialize, Serialize};
@@ -38,23 +37,33 @@ impl Info {
 }
 
 pub struct InfoBuilder {
-    id: String,
+    id: Option<String>,
 }
-impl PlayerBuilder for InfoBuilder {
-    type Player = Info;
-    fn new(id: String) -> Result<Self, Box<(dyn std::error::Error)>> {
-        Ok(Self { id })
-    }
 
-    fn build(&self) -> Result<Info, Box<dyn std::error::Error>> {
-        let parsed = temp::parse::player_info(&self.id);
-        let se: serde_json::Result<Info> = serde_json::from_str(&parsed);
-        match se {
-            Err(_) => Err(Box::new(lisa_error::new(
-                "parse failed",
-                lisa_error::Kind::DataError,
+impl builder::Builder for InfoBuilder {
+    type Target = Info;
+
+    fn new() -> Self {
+        Self { id: None }
+    }
+    fn build(&mut self) -> std::result::Result<Self::Target, Box<dyn std::error::Error>> {
+        match &self.id {
+            Some(id) => {
+                let parse_player = temp::parse::player(&id);
+                let player: Self::Target = serde_json::from_str(parse_player.as_str())?;
+                Ok(player)
+            }
+            None => Err(Box::new(builder::Error::new(
+                "ID not Initialized".to_string(),
             ))),
-            Ok(ok) => Ok(ok),
         }
     }
 }
+
+impl PlayerBuilder for InfoBuilder {
+    fn set_id(&mut self, id: &str) {
+        self.id = Some(id.to_string());
+    }
+}
+
+impl InfoBuilder {}

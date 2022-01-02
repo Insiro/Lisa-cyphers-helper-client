@@ -1,5 +1,5 @@
+use super::builder::Builder as ObjBuilder;
 use serde::{Deserialize, Serialize};
-
 #[derive(Serialize, Deserialize)]
 pub enum Gender {
     Male,
@@ -31,10 +31,8 @@ pub trait Player: super::Object {
     fn get_grade(&self) -> u8;
 }
 
-trait PlayerBuilder: Sized {
-    type Player;
-    fn new(id: String) -> Result<Self, Box<dyn std::error::Error>>;
-    fn build(&self) -> Result<Self::Player, Box<dyn std::error::Error>>;
+pub trait PlayerBuilder: ObjBuilder {
+    fn set_id(&mut self, id: &str);
 }
 
 #[macro_export]
