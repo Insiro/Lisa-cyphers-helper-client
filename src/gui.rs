@@ -43,7 +43,14 @@ impl LisaApp {
 
 pub fn init() {
     nwg::init().expect("Filed to start gui");
-    nwg::Font::set_global_family("Segoe UI").expect("Failed to set default font");
+    // nwg::Font::set_global_family("Segoe UI").expect("Failed to set default font");
+    let mut font = nwg::Font::default();
+    nwg::Font::builder()
+        .size(16)
+        .family("Segoe UI")
+        .build(&mut font)
+        .expect("failed set font");
+    nwg::Font::set_global_default(Some(font));
     let app = LisaApp::build_ui(Default::default()).expect("failed to build ui");
     nwg::dispatch_thread_events();
 }

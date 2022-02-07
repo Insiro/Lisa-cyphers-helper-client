@@ -8,26 +8,30 @@ use nwg::stretch::{
 const FIFTY_PC: D = D::Percent(100.0);
 #[derive(Default, NwgPartial)]
 pub struct SideBar {
-    #[nwg_layout]
+    #[nwg_layout(flex_direction:FlexDirection::Column)]
     layout: nwg::FlexboxLayout,
 
     #[nwg_control]
-    #[nwg_layout_item(layout: layout, size:Size{width:D::Percent(1.0), height:D::Percent(0.2)})]
+    #[nwg_layout_item(layout: layout, size:Size{width:D::Auto, height:D::Points(40.0)})]
     search_bar_frame: nwg::Frame,
 
     #[nwg_partial(parent:search_bar_frame)]
     search_bar: SearchBar,
+
+    #[nwg_control]
+    #[nwg_layout_item(layout:layout,flex_grow:1.0, size:Size{width:D::Auto, height:D::Auto})]
+    result: nwg::Button,
 }
 // nwg::subclass_control!(SideBar, FlexboxLayout, layout);
 
 #[derive(Default, NwgPartial)]
 pub struct SearchBar {
-    #[nwg_layout]
+    #[nwg_layout(flex_direction:FlexDirection::Row,padding:Rect{bottom:D::Points(3.0), start:D::Points(1.0), end:D::Points(1.0),top:D::Points(3.0) },        )]
     layout: nwg::FlexboxLayout,
-    #[nwg_control(text:"검색")]
-    #[nwg_layout_item(layout: layout, size: Size { width: D::Percent(0.8), height: D::Auto })]
+    #[nwg_control(text:"닉네임")]
+    #[nwg_layout_item(layout: layout, flex_grow:1.0, size:Size{width:D::Auto, height:D::Auto})]
     search_bar: nwg::TextInput,
     #[nwg_control(text:"검색")]
-    #[nwg_layout_item(layout: layout, size: Size { width: D::Percent(0.2), height: D::Auto })]
+    #[nwg_layout_item(layout: layout, size:Size{width:D::Percent(0.2), height:D::Auto})]
     search_btn: nwg::Button,
 }
