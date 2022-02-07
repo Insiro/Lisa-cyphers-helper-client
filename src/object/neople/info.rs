@@ -120,10 +120,12 @@ pub struct Item {
     #[getset(get)]
     equipSlotName: String,
 }
-#[derive(Deserialize,Getters)]
+#[derive(Deserialize, Getters)]
 pub struct Character {
-    #[getset(get)]characterId: String,
-    #[getset(get)]characterName: String,
+    #[getset(get)]
+    characterId: String,
+    #[getset(get)]
+    characterName: String,
 }
 impl Character {
     pub fn get_list() -> lisa_error::Result<Vec<Character>> {

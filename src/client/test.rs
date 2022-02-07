@@ -1,4 +1,3 @@
-
 use super::*;
 #[test]
 fn generate_client() {

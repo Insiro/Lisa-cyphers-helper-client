@@ -11,5 +11,5 @@ fn check_version() {
     // let option = root.metadata["my"]["option"].as_str().unwrap();
     let version = &root.version;
     // println!("{}",option);
-    println!("{}",version);
+    println!("{}", version);
 }

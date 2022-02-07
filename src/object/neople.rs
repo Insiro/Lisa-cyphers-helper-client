@@ -4,4 +4,4 @@ pub mod matches;
 pub mod ranking;
 
 pub trait Object: super::Object {}
-pub trait Builder{}
+pub trait Builder {}
