@@ -1,79 +1,54 @@
-pub enum Kind {
-    Main,
-    Matches,
-    Profile,
-    GameRecord,
-    Notic,
-}
-impl Kind {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Kind::Main => "main",
-            Kind::Matches => "match",
-            Kind::Profile => "profile",
-            Kind::GameRecord => "record",
-            Kind::Notic => "notic",
-        }
-    }
-}
-
-pub mod new {
-    use crate::page::Page;
-
-    pub struct History {
-        key: Option<String>,
-        page: Page,
-    }
-    
-    pub struct Histories(Vec<History>);
-    impl Histories {
-        pub fn new() -> Self {
-            Histories(vec![])
-        }
-        pub fn len(&self) -> usize {
-            self.0.len()
-        }
-        pub fn insert(&mut self, history: History) {
-            self.0.push(history);
-        }
-        pub fn pop(&mut self) -> Option<History> {
-            self.0.pop()
-        }
-    }
-}
+use crate::page::Page;
 
 pub struct History {
-    page: Kind,
+    page: Page,
     key: Option<String>,
 }
+
+impl History {
+    fn load(&self) {
+        let ui = self.page.get_ui();
+        let page = self.page.load();
+
+        todo!()
+    }
+    pub fn new(page: Page, key: Option<String>) -> Self {
+        Self { page, key }
+    }
+}
+
 pub fn init() -> Histories {
-    Histories { list: vec![] }
+    Histories(vec![])
 }
-pub struct Histories {
-    list: Vec<History>,
-}
+
+pub struct Histories(Vec<History>);
+
 impl Histories {
-    pub fn inset(&mut self) {}
+    pub fn insert(&mut self, history: History) {
+        self.0.push(history);
+    }
     pub fn clear(&mut self) {
-        self.list.clear();
+        self.0.clear();
     }
     pub fn len(&self) -> usize {
-        self.list.len()
+        self.0.len()
     }
+
+    pub fn pop(&mut self) -> Option<History> {
+        self.0.pop()
+    }
+
     pub fn push(&mut self, history: History) {
-        self.list.push(history);
+        self.0.push(history);
     }
 
     pub fn change_key(&mut self, key: &str) {
-        match self.list.last_mut() {
+        match self.0.last_mut() {
             None => {}
             Some(item) => item.key = Some(key.to_string()),
         }
     }
     pub fn get_curr(&self) -> Option<&History> {
-        self.list.last()
-    }
-    pub fn new(page: Kind, key: Option<String>) -> History {
-        History { page, key }
+        self.0.last()
     }
 }

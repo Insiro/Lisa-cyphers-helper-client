@@ -1,4 +1,7 @@
-use crate::util::{history, temp};
+use crate::{
+    gui::GUIUi,
+    util::{history, temp},
+};
 use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
@@ -49,8 +52,12 @@ pub struct Client {
     pub user: userinfo::UserInfo,
     pub subscription: subscription::Subscription,
     pub config_path: String,
+    app: GUIUi,
 }
 impl Client {
+    pub fn get_ui_controller(&mut self) -> &GUIUi {
+        &self.app
+    }
     pub fn new() -> Self {
         let setting_path_str = temp::get_config_path();
         let setting_path = Path::new(setting_path_str.as_str());
@@ -64,6 +71,7 @@ impl Client {
             user: userinfo::UserInfo::new(config_path),
             subscription: subscription::Subscription::new(config_path),
             config_path: raw_path,
+            app: crate::gui::init(),
         }
     }
     pub fn print_start_msg(&self) {

@@ -55,3 +55,10 @@ pub fn init() -> GUIUi {
     nwg::dispatch_thread_events();
     app
 }
+
+pub enum UI {
+    Settings,
+    Main,
+    Records,
+    Matches,
+}
