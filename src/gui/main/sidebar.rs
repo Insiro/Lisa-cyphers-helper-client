@@ -1,11 +1,11 @@
 use native_windows_derive as nwd;
 use native_windows_gui as nwg;
-use nwd::{NwgPartial, NwgUi};
+use nwd::NwgPartial;
 use nwg::stretch::{
     geometry::{Rect, Size},
     style::{Dimension as D, FlexDirection},
 };
-const FIFTY_PC: D = D::Percent(100.0);
+
 #[derive(Default, NwgPartial)]
 pub struct SideBar {
     #[nwg_layout(flex_direction:FlexDirection::Column)]
@@ -15,12 +15,17 @@ pub struct SideBar {
     #[nwg_layout_item(layout: layout, size:Size{width:D::Auto, height:D::Points(40.0)})]
     search_bar_frame: nwg::Frame,
 
+    #[nwg_control(text:"새로 고침")]
+    #[nwg_layout_item(layout: layout, size:Size{width:D::Auto, height:D::Points(20.0)})]
+    #[nwg_events(OnButtonClick: [SideBar::update_accessings(SELF)])]
+    search_btn: nwg::Button,
+
     #[nwg_partial(parent:search_bar_frame)]
     search_bar: SearchBar,
 
-    #[nwg_control]
+    #[nwg_control(collection: vec![])]
     #[nwg_layout_item(layout:layout,flex_grow:1.0, size:Size{width:D::Auto, height:D::Auto})]
-    result: nwg::Button,
+    result: nwg::ListBox<String>,
 }
 // nwg::subclass_control!(SideBar, FlexboxLayout, layout);
 
@@ -32,6 +37,10 @@ pub struct SearchBar {
     #[nwg_layout_item(layout: layout, flex_grow:1.0, size:Size{width:D::Auto, height:D::Auto})]
     search_bar: nwg::TextInput,
     #[nwg_control(text:"검색")]
-    #[nwg_layout_item(layout: layout, size:Size{width:D::Percent(0.2), height:D::Auto})]
+    #[nwg_layout_item(layout: layout, size:Size{width:D::Percent(0.2), height:D::Points(30.0)})]
     search_btn: nwg::Button,
+}
+
+impl SideBar {
+    pub fn update_accessings(&self) {}
 }
