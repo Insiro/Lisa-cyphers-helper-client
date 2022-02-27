@@ -1,4 +1,4 @@
-use crate::page::Page;
+use crate::{client::Client, page::Page};
 
 pub struct History {
     page: Page,
@@ -6,11 +6,14 @@ pub struct History {
 }
 
 impl History {
-    fn load(&self) {
+    pub fn load(&self) {
         let ui = self.page.get_ui();
         let page = self.page.load();
-
-        todo!()
+        let client = Client::instance();
+        let borrowed = client.borrow_mut();
+        let mut ins = borrowed.try_write().unwrap();
+        let controller = (*ins).get_ui_controller();
+        controller.load_ui(ui, page);
     }
     pub fn new(page: Page, key: Option<String>) -> Self {
         Self { page, key }

@@ -101,6 +101,7 @@ impl Client {
             }
         }
     }
+
     pub fn start_msg(&self) {
         println!("start as cli");
         println!("---setting---");

@@ -8,6 +8,8 @@ use nwd::NwgUi;
 use nwg::stretch::{geometry::Size, style::Dimension as D};
 use nwg::NativeUi;
 
+use crate::page::PageTrait;
+
 #[derive(Default, NwgUi)]
 pub struct GUI {
     #[nwg_control(size: (1000, 500), position: (400, 200), title: "Lisa - CyphersSupporter")]
@@ -36,7 +38,8 @@ impl GUI {
         nwg::simple_message("Goodbye", "bye");
         nwg::stop_thread_dispatch();
     }
-    pub fn load_ui(&self) {
+    pub fn load_ui(&self, _ui: UI, _page: Box<dyn PageTrait>) {
+        //TODO: load detailes info
         todo!();
     }
 }
