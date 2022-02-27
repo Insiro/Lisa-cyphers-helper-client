@@ -1,14 +1,13 @@
-use std::io;
-
 use crate::object::player;
 use serde::{Deserialize, Serialize};
 
+
 #[derive(Serialize, Deserialize)]
-pub struct GameRecord {
+pub struct Record {
     player: player::Info,
     records: Vec<GameInfo>,
 }
-impl GameRecord {
+impl Record {
     pub fn get_player(&mut self) -> &player::Info {
         &self.player
     }
@@ -16,13 +15,14 @@ impl GameRecord {
         &self.records
     }
 }
-pub fn dumy() -> GameRecord {
-    GameRecord {
+
+pub fn dumy() -> Record {
+    Record {
         player: player::Info::dumy(),
         records: vec![],
     }
 }
-pub fn search(_id: &str) -> Option<GameRecord> {
+pub fn search(_id: &str) -> Option<Record> {
     //TODO: search by api
     Some(dumy())
 }
@@ -66,5 +66,3 @@ impl GameInfo {
         &self.match_id
     }
 }
-
-pub fn help(_args: Vec<String>) {}
