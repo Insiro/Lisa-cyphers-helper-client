@@ -1,20 +1,17 @@
 #![windows_subsystem = "windows"]
 extern crate native_windows_derive as nwd;
 extern crate native_windows_gui as nwg;
-// pub mod main;
-pub mod sidebar;
-use nwd::{NwgPartial, NwgUi};
-use nwg::stretch::{
-    geometry::Size,
-    style::{Dimension as D, FlexDirection},
-};
+pub mod main;
+pub use g_u_i_ui::GUIUi;
+use main::SideBar;
+use nwd::NwgUi;
+use nwg::stretch::{geometry::Size, style::Dimension as D};
 use nwg::NativeUi;
-use sidebar::SideBar;
 
 #[derive(Default, NwgUi)]
-pub struct LisaApp {
+pub struct GUI {
     #[nwg_control(size: (1000, 500), position: (400, 200), title: "Lisa - CyphersSupporter")]
-    #[nwg_events( OnWindowClose: [LisaApp::exit], OnInit: [LisaApp::setup] )]
+    #[nwg_events( OnWindowClose: [GUI::exit], OnInit: [GUI::setup] )]
     window: nwg::Window,
 
     #[nwg_layout(parent:window)]
@@ -31,7 +28,7 @@ pub struct LisaApp {
     #[nwg_layout_item(layout: layout, size:Size{width:D::Percent(0.8), height:D::Auto})]
     contents: nwg::Button,
 }
-impl LisaApp {
+impl GUI {
     fn setup(&self) {
         print!("setup");
     }
@@ -39,9 +36,12 @@ impl LisaApp {
         nwg::simple_message("Goodbye", "bye");
         nwg::stop_thread_dispatch();
     }
+    pub fn load_ui(&self) {
+        todo!();
+    }
 }
 
-pub fn init() {
+pub fn init() -> GUIUi {
     nwg::init().expect("Filed to start gui");
     // nwg::Font::set_global_family("Segoe UI").expect("Failed to set default font");
     let mut font = nwg::Font::default();
@@ -51,6 +51,7 @@ pub fn init() {
         .build(&mut font)
         .expect("failed set font");
     nwg::Font::set_global_default(Some(font));
-    let app = LisaApp::build_ui(Default::default()).expect("failed to build ui");
+    let app = GUI::build_ui(Default::default()).expect("failed to build ui");
     nwg::dispatch_thread_events();
+    app
 }
