@@ -1,7 +1,14 @@
-use crate::command::Command;
+use super::PageTrait;
 
-pub fn cli(mut _args: Vec<String>) -> Command {
-    Command::NotImpletated
-}
-fn cli_main() {}
 pub fn help(_args: Vec<String>) {}
+pub struct Set {}
+
+impl PageTrait for Set {
+    fn load(_key: String) -> Self {
+        todo!()
+    }
+
+    fn get_key(&self) -> String {
+        todo!()
+    }
+}

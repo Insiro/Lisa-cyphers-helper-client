@@ -1,4 +1,6 @@
 use crate::object::{charactor::Charactor, player};
+
+use super::PageTrait;
 pub struct PlayerInfo {
     player: player::Info,
     kill: u8,
@@ -71,22 +73,12 @@ pub fn get_match(_id: &str) -> MatchInfo {
     MatchInfo::dumy()
 }
 
-use crate::command::Command;
+impl PageTrait for MatchInfo {
+    fn load(_key: String) -> Self {
+        todo!()
+    }
 
-pub fn cli(mut _args: Vec<String>) -> Command {
-    Command::NotImpletated
-}
-
-pub fn cls() {
-    loop {
-        let query = "".to_string();
-        match query.as_str() {
-            "get" => {
-                get_match("");
-            }
-            "back" => break,
-            _ => break,
-        }
+    fn get_key(&self) -> String {
+        todo!()
     }
 }
-pub fn help(_args: Vec<String>) {}

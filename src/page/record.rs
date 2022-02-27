@@ -1,6 +1,7 @@
 use crate::object::player;
 use serde::{Deserialize, Serialize};
 
+use super::PageTrait;
 
 #[derive(Serialize, Deserialize)]
 pub struct Record {
@@ -64,5 +65,15 @@ impl GameInfo {
     }
     pub fn get_id(&self) -> &String {
         &self.match_id
+    }
+}
+
+impl PageTrait for Record {
+    fn load(key: String) -> Self {
+        todo!()
+    }
+
+    fn get_key(&self) -> String {
+        todo!()
     }
 }
